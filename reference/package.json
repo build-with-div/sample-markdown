@@ -1,0 +1,17 @@
+{
+  "name": "sample-markdown-reference",
+  "private": true,
+  "description": "Builds the Chromium reference pages for the Markdown fidelity fixtures",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "github-markdown-css": "5.9.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "rehype-raw": "7.0.0",
+    "remark-gfm": "4.0.1"
+  }
+}
