@@ -9,7 +9,7 @@ Checked against Div `565db46a`; the gaps are unchanged at `92ea25a0` (same measu
 
 | Label | Gap | Workaround here | Where | Inventory |
 | --- | --- | --- | --- | --- |
-| G-CASCADE | No UA stylesheet and no author stylesheets, so github-markdown-css cannot apply | Computed mode copies Chromium's computed style onto each element. It is used only to measure layout, paint and text | `harness/render/src/main.rs` (`Builder::style`) | MD-3, MD-4, MD-5, MD-6 |
+| G-CASCADE | No UA stylesheet and no author stylesheets, so github-markdown-css cannot apply | Computed mode copies Chromium's computed style onto each element. It is used only to measure layout, paint and text. The fix is Div's UA stylesheet (S5) and A1 with the browser-compatible ingestion mode adopted on 13 November 2026, not this copy | `harness/render/src/main.rs` (`Builder::style`) | MD-3, MD-4, MD-5, MD-6 |
 | G-TAGS | `Element::create` rejects `blockquote`, `pre`, `code`, `del`, `kbd`, `sub`, `sup` | `span` or `div` stand-in, chosen by Chromium's `display` | `Builder::element` | MD-1 |
 | G-ROOT | `Document::body()` is the root, with no `html`/`body` pair, and given an 8px margin it still fills the viewport | The captured `<body>` is built as a `div` inside Div's body | `build` | MD-2 |
 | G-LITERALS | `border-*-width` takes `1` but not `1px`; the `list-style-type` longhand is named `list-style` in `StyleProperty::from_css_name` | Retry with the bare number or the other name, counted as "normalized" in the report | `Builder::style` | MD-10 |

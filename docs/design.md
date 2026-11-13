@@ -151,7 +151,7 @@ read from Div's source.
 | MD-1 | all → HTML element identity | Measured: `Element::create` rejects `blockquote`, `pre`, `code`, `del`, `kbd`, `sub`, `sup` (`UnknownTag`). Read: also `s`, `b`, `i`, `ins`, `mark`, `dl`/`dt`/`dd`, `abbr`, `q`, `samp`, `var`, `figure`, `picture`. `h1`–`h6`, `p`, `ul`, `ol`, `hr` become `Div` with no name kept | Every element GitHub's sanitizer allows, with its local name kept for selectors and accessibility ([RFC 0004](https://github.com/build-with-div/div/blob/main/docs/alpha/rfcs/0004-style-presets.md) prerequisite 1) | framework (`tag_definition`, `view!`) + engine (`LocalName` in div-dom) | M |
 | MD-2 | all → `html`/`body` pair | Measured: `Document::body()` is the root. Given Chromium's body style (8 px margin) it still lays out at 0,0 800×600 | A root `html` with `body` inside it, so the UA `body { margin: 8px }` and root background propagation work | engine + framework | M |
 | MD-3 | react-markdown → UA stylesheet | Measured: semantic mode 0/392 boxes. Read: RFC 0004 proposed, not started | The browser preset's text, sections, lists and tables parts first: these are what Markdown uses | engine | L |
-| MD-4 | github-markdown-css → selectors and cascade | Read: A1 in progress (`style!` done; `css!`, `stylesheet!` next). RFC 0001 makes unsupported selectors compile errors | `stylesheet!` over the npm file. Descendant, child and sibling combinators; attribute selectors; `:hover`, `:focus-visible`, `:not`, `:has`, `:first/last/nth-child`, `:target`, `:dir`. A browser-compatible mode for third-party sheets that drops what Chromium drops (10 vendor pseudo-elements, `-ms-`/`-webkit-` properties) and reports it ([RFC](rfc-markdown.md#3-third-party-stylesheets)) | engine (A1) | L |
+| MD-4 | github-markdown-css → selectors and cascade | Read: A1 in progress (`style!` done; `css!`, `stylesheet!` next). RFC 0001 makes unsupported selectors compile errors | `stylesheet!` over the npm file. Descendant, child and sibling combinators; attribute selectors; `:hover`, `:focus-visible`, `:not`, `:has`, `:first/last/nth-child`, `:target`, `:dir`. A browser-compatible ingestion mode for third-party sheets that drops what Chromium drops (10 vendor pseudo-elements, `-ms-`/`-webkit-` properties) and reports it ([RFC](rfc-markdown.md#3-third-party-stylesheets)). Adopted in the platform decisions of 13 November 2026 (Q3, option B); compile-time strictness stays for Div-authored code | engine (A1, ingestion) | L |
 | MD-5 | github-markdown-css → custom properties | Read: none (A2 tokens planned) | 60 tokens, 124 `var()` uses, swapped by `[data-theme]` or the color scheme | engine (A2) | M |
 | MD-6 | github-markdown-css → media | Read: none (A2) | `prefers-color-scheme`, `max-width: 767px`; the framework follows the OS theme (`Document::set_color_scheme` in RFC 0001) | engine (A2) + framework | M |
 | MD-7 | lists → markers and counters | Measured: `list-style-type` takes `none` and `disc` only; `counter-increment: list-item 0` and `list-style-position: inside` rejected | `decimal`, `lower-roman`, `circle`, `square` (and the rest of CSS Counter Styles' predefined set Chromium has), `ol start`/`reversed`/`li value`, the `list-item` counter, `inside` markers | engine | M |
@@ -162,14 +162,14 @@ read from Div's source.
 | MD-12 | all text → line metrics and glyph position | Measured: line box 1/64 px off at 13.6 px (h6, code); h1 (32 px, weight 600) glyphs differ at 1x; text 1 device px lower at 2x in some paragraphs | Match Chromium's LayoutUnit snapping of line height and glyph origins; cause not yet isolated | engine (text) | M |
 | MD-13 | footnotes, clearfix → `::before`/`::after` | Read: `set_pseudo_style` covers first-line, first-letter, marker and placeholder only | Generated content from stylesheets (comes with A1 sheets); a public target for before/after | engine (A1) | S after A1 |
 | MD-14 | details → disclosure marker | Measured: `disclosure-open`/`-closed` rejected by the literal parser, though the enum has them | Parse them; the UA preset gives `summary` its marker | engine | S |
-| MD-15 | images → `<img src>` | Measured: setting `src` loads nothing; the app must register bytes and pass the intrinsic size, otherwise 300×150. Read: static SVG draws only `<rect>` (components track finding) | `src` resolved through the document's resource provider with a base URL; size from the decoded bytes; async remote loading; SVG paths, strokes and text | framework + engine (paint) | M (+L for SVG) |
-| MD-16 | all → text selection and copy | Read: `copy_selection` copies only from the focused form control; no document selection | Selection across elements (drag, double and triple click, Ctrl+A), `::selection` paint, `user-select`, copy as text | engine + framework | L |
+| MD-15 | images → `<img src>` | Measured: setting `src` loads nothing; the app must register bytes and pass the intrinsic size, otherwise 300×150. Read: static SVG draws only `<rect>` (components track finding) | `src` resolved through the document's resource provider with a base URL; size from the decoded bytes; async remote loading; SVG paths, strokes and text from the inline SVG painter (V1), which the platform decisions of 13 November 2026 schedule right after the engine's Tier 0 | framework + engine (paint, V1) | M (+L for SVG) |
+| MD-16 | all → text selection and copy | Read: `copy_selection` copies only from the focused form control; no document selection | The web-shaped `Range`/`Selection`/`StaticRange` model the editor sample needs (decision of 13 November 2026, Q7), and on top of it Markdown's conveniences: drag, double and triple click, Ctrl+A, `::selection` paint, `user-select`, copy as text | engine (model) + framework (input, copy) | L |
 | MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
 | MD-18 | GitHub raw HTML → presentational attributes | Read: none | `align` on `p`/`div`/`img`/headings, `width`/`height` on `img` (GitHub strips `style`, so no runtime CSS is needed for parity) | engine (UA preset) | S |
 | MD-19 | the component | – | A `div-markdown` crate: comrak → real elements → `github-markdown-css` compiled by `stylesheet!` ([API](#recommended-component-api)) | components | M (after MD-1, 3, 4) |
 | MD-20 | Shiki → highlighting | Read: colored spans work today (inline `color`) | Nothing in Div for single themes. Shiki's dual themes need MD-5 and MD-6 | components (syntect) | S |
-| MD-21 | KaTeX (stretch) | Read: `register_font_face` exists; WOFF2 fails on Linux with the census FreeType (components track); SVG `path` fill not drawn | `@font-face` in sheets, WOFF2 decode on Linux, SVG paths, exact inline-block baselines | engine | L |
-| MD-22 | Mermaid (stretch) | Div has no JavaScript by design | A Rust port of the layout (dagre) plus SVG text, strokes and markers; or pre-rendered SVG. Defer | components + engine | L |
+| MD-21 | KaTeX (stretch) | Read: `register_font_face` exists; WOFF2 fails on Linux with the census FreeType (components track); SVG `path` fill not drawn | `@font-face` in sheets, WOFF2 decode on Linux, SVG paths (V1), exact inline-block baselines | engine | L |
+| MD-22 | Mermaid (stretch) | Div has no JavaScript by design | A Rust port of the layout (dagre) plus SVG text, strokes and markers (V1 stages); or pre-rendered SVG. Defer | components + engine | L |
 
 ## Recommended component API
 
@@ -228,10 +228,12 @@ view! {
 3. **Element identity and root** (MD-1, MD-2): RFC 0004 steps 2–3.
 4. **Browser preset, Markdown parts first** (MD-3, MD-18): text and
    sections, lists, tables.
-5. **A1 `stylesheet!` with a browser-compatible mode** (MD-4, MD-13), then A2
-   tokens and media (MD-5, MD-6).
-6. **App features:** `<img src>` loading (MD-15), links (MD-17), document
-   selection (MD-16).
+5. **A1 `stylesheet!` with the browser-compatible ingestion mode** (MD-4,
+   MD-13), then A2 tokens and media (MD-5, MD-6). Both are Tier 0, and the
+   ingestion mode was adopted on 13 November 2026.
+6. **App features:** `<img src>` loading (MD-15), with SVG images on the V1
+   painter that follows Tier 0; links (MD-17); document selection (MD-16)
+   as conveniences over the editor's `Range`/`Selection` model.
 7. **Component** (MD-19, MD-20); then KaTeX (MD-21). Mermaid stays deferred
    (MD-22).
 
@@ -260,7 +262,7 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
-| P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!`), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
+| P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
 | P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
 
 P2-1 and P2-4 are pure Rust and need nothing from Div. P2-2 and P2-3 need
