@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["harness/render"]
+members = ["crates/markdown-tree", "harness/render"]
 
 [workspace.package]
 edition = "2021"
@@ -15,6 +15,9 @@ publish = false
 # gap 24: a fresh resolve picks a zbus_macros that does not build on Linux).
 divui = { git = "https://github.com/build-with-div/div", rev = "92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f" }
 serde_json = "1.0"
+comrak = { version = "=0.59.0", default-features = false }
+html5ever = "=0.40.1"
+markup5ever_rcdom = "=0.40.1"
 
 # The framework's dependency patches, which Cargo does not apply to
 # dependents. Keep them equal to the pinned Div workspace's.

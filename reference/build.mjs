@@ -18,6 +18,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { createHash } from "node:crypto";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -116,3 +117,55 @@ for (const file of readdirSync(fixtures).filter((name) => name.endsWith(".md")).
 }
 writeFileSync(join(pages, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 console.log(`wrote ${manifest.fixtures.length} pages`);
+
+// Corpora for the Rust port's tree test (crates/markdown-tree), beyond the
+// fixtures: the CommonMark spec's examples and this repository's GFM cases
+// (fixtures/gfm-cases.json), through the same pipeline. The expected HTML
+// is react-markdown's output, not the spec's, since remark-gfm and
+// rehype-raw are on.
+function writeCorpus(name, extraVersions, cases) {
+  const examples = cases.map(({ number, section, markdown }) => {
+    const example = { number, section, markdown };
+    try {
+      example.html = render(markdown);
+    } catch (error) {
+      example.error = String(error.message || error).split("\n")[0];
+    }
+    return example;
+  });
+  mkdirSync(join(here, "corpus"), { recursive: true });
+  writeFileSync(
+    join(here, "corpus", `${name}.json`),
+    JSON.stringify(
+      { schema: "sample-markdown-corpus-v1", versions: { ...versions, ...extraVersions }, examples },
+      null,
+      1,
+    ) + "\n",
+  );
+  console.log(`wrote ${examples.length} ${name} examples`);
+}
+
+// The spec writes tabs as "→".
+const require = createRequire(import.meta.url);
+const spec = require("commonmark-spec");
+const specVersion = JSON.parse(
+  readFileSync(join(modules, "commonmark-spec", "package.json"), "utf8"),
+).version;
+writeCorpus(
+  "commonmark",
+  { "commonmark-spec": specVersion },
+  spec.tests.map((test) => ({
+    number: test.number,
+    section: test.section,
+    markdown: test.markdown.replace(/→/g, "\t"),
+  })),
+);
+writeCorpus(
+  "gfm",
+  {},
+  JSON.parse(readFileSync(join(fixtures, "gfm-cases.json"), "utf8")).map((test, index) => ({
+    number: index + 1,
+    section: test.name,
+    markdown: test.markdown,
+  })),
+);

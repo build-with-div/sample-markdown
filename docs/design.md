@@ -258,7 +258,8 @@ The sample ports the packages. It does not stand in for the platform:
 | # | Milestone | Ports | Measured by |
 | --- | --- | --- | --- |
 | P2-0 | Pin Div `main` (92ea25a0), reseed the lock, rerun the yardstick | – | reference pages, both modes |
-| P2-1 | `markdown` crate: Markdown source → the element tree react-markdown, remark-gfm and rehype-raw build (tags, attributes, classes, text), with raw HTML filtered by GitHub's sanitizer allow-list | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages`, per fixture |
+| P2-1 | `markdown-tree` crate: Markdown source → the DOM Chromium builds for react-markdown with remark-gfm and rehype-raw (tags, attributes, classes, text, in order). Done: [result](#p2-1-result) | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages` per fixture, and with the CommonMark and GFM corpora |
+| P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
@@ -267,6 +268,56 @@ The sample ports the packages. It does not stand in for the platform:
 
 P2-1 and P2-4 are pure Rust and need nothing from Div. P2-2 and P2-3 need
 only today's API plus labeled gaps. P2-5 waits for the engine.
+
+### P2-1 result
+
+`crates/markdown-tree` ports the pipeline step by step:
+- **Parse:** comrak (micromark's role) parses CommonMark and GFM.
+- **Hast:** mdast-util-to-hast's handlers build hast.
+- **Raw HTML:** html5ever stands in for parse5 as rehype-raw re-parses
+  the tree.
+- **Props and React:** hastscript's property types, react-markdown's URL
+  filter, hast-util-to-jsx-runtime's props and React 19's static markup
+  rules follow.
+- **Result:** html5ever parses that markup as Chromium does.
+
+The result is the element tree a Div document needs (P2-2). Nothing in it
+depends on Div.
+
+Measured by `cargo test -p markdown-tree`, against outputs
+`reference/build.mjs` writes from the pinned npm packages:
+
+| Input | Trees equal | Listed differences |
+| --- | --- | --- |
+| Fixtures (`reference/pages`) | 12/12 | none |
+| CommonMark 0.31.2 spec examples (`reference/corpus/commonmark.json`) | 651/652 | #606: remark-gfm links an email autolink literal after `\+`, comrak does not |
+| GFM cases (`fixtures/gfm-cases.json`, `reference/corpus/gfm.json`) | 51/52 | #15: micromark closes `~~a ~b~~` as strikethrough, comrak keeps the text |
+
+"Equal" means the same elements, namespaces, attributes (names, values,
+order) and text as html5ever's parse of React's markup for that input. The
+listed differences are comrak's parsing, kept in
+`crates/markdown-tree/tests/*-known-differences.txt`. The test fails if
+another example differs or a listed one starts to match.
+
+Behavior ported along the way, each covered by the corpora:
+- parse5's `skipNextNewLine` as rehype-raw drives it: the first line ending
+  of a code block's text is dropped.
+- An HTML block of kinds 1–5 that runs unclosed to the end of the input
+  keeps its line endings.
+- remark-gfm's task marker: plain text unless content follows it.
+- On `<input>`, React writes `checked` and `value` last.
+- React drops unknown boolean attributes, writes `size` only at 1 or more,
+  and keeps an empty `href` only on `<a>`.
+- Table cells' `align` becomes `style="text-align:…"`, after any existing
+  declarations.
+- Whitespace text inside table rows and sections is dropped.
+
+Not ported and not measured:
+- React 19 hoists `<title>`, `<meta>` and `<link>` to the start of its
+  output.
+- comrak does not tell an empty link title from a missing one.
+
+GitHub's sanitizer strips the first, and the second needs `[a](/u "")`.
 
 ### Yardstick history
 
