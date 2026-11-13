@@ -7,7 +7,9 @@ packages rely on, and we measure each one against pinned Chromium.
 
 This is the phase 1 report. Everything below was measured against Div
 `565db46a` (build-with-div/div `main`, 13 November 2026) and Chrome for
-Testing 147.0.7727.50 in WSL, or read from Div's source at that commit. Full
+Testing 147.0.7727.50 in WSL, or read from Div's source at that commit. A
+rerun at the current pin, `92ea25a0`, gave the same values for every fixture,
+box and block ([yardstick history](#yardstick-history)). Full
 numbers: [fidelity-results.md](fidelity-results.md), generated from
 [evidence/fidelity-v1.json](evidence/fidelity-v1.json). Proposed Div APIs:
 [rfc-markdown.md](rfc-markdown.md). Code-level `// div-gap:` labels:
@@ -233,10 +235,48 @@ view! {
 7. **Component** (MD-19, MD-20); then KaTeX (MD-21). Mermaid stays deferred
    (MD-22).
 
-Phase 2 (the viewer sample: open a `.md` file, light/dark, highlighting) can
-start after step 1. Until steps 3–5 land it needs labeled `// div-gap:`
-scaffolding: a per-tag style table standing in for the UA sheet and
-github-markdown-css.
+## Phase 2 milestones
+
+Phase 2 started on 13 November 2026, with Div's Tier 0 foundations
+scheduled: selectors, the UA stylesheet (S5), element identity (S6), and
+custom properties and media. Each milestone below is one focused PR, merged
+before the next starts.
+
+The sample ports the packages. It does not stand in for the platform:
+- **No sample look.** It has no style table, copied UA sheet or copy of
+  github-markdown-css. Until S5 and A1 land, a Div render of the port shows
+  what Div itself provides, and the yardstick measures that.
+- **Gaps are labeled.** Where an API is missing, the code is labeled
+  `// div-gap: <id> <web feature>` and listed in
+  [framework-gaps.md](framework-gaps.md).
+- **The yardstick moves with the pin.** It is the reference-pages
+  comparison (semantic 0/392 boxes, computed 214/392 at `565db46a`), rerun
+  whenever the pin moves.
+
+| # | Milestone | Ports | Measured by |
+| --- | --- | --- | --- |
+| P2-0 | Pin Div `main` (92ea25a0), reseed the lock, rerun the yardstick | – | reference pages, both modes |
+| P2-1 | `markdown` crate: Markdown source → the element tree react-markdown, remark-gfm and rehype-raw build (tags, attributes, classes, text), with raw HTML filtered by GitHub's sanitizer allow-list | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages`, per fixture |
+| P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree | – | Yardstick semantic mode, rendered from source |
+| P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
+| P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
+| P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!`), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
+| P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
+
+P2-1 and P2-4 are pure Rust and need nothing from Div. P2-2 and P2-3 need
+only today's API plus labeled gaps. P2-5 waits for the engine.
+
+### Yardstick history
+
+`harness/compare.py` over all 24 reference pages, Chrome for Testing
+147.0.7727.50 in WSL. Each row is a full run at that pin. Its
+`docs/evidence/fidelity-v1.json` is in the git history of the commit that
+added the row.
+
+| Div pin | Semantic: pages exact / boxes | Computed: pages exact / boxes | Computed blocks exact 1x / 2x | Change |
+| --- | --- | --- | --- | --- |
+| `565db46a` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | phase 1 baseline |
+| `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | none: every measured value equal (the two new commits are framework-only `{expr}` view children) |
 
 ## CSS inventory
 
