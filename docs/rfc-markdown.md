@@ -76,7 +76,12 @@ and github-markdown-css contains rules no browser applies to Markdown either:
   `::-webkit-file-upload-button` and others;
 - properties: `-ms-text-size-adjust`, `-webkit-appearance`.
 
-Proposal: a compatibility mode on `stylesheet!`:
+Proposal: a compatibility mode on `stylesheet!`. Adopted for
+github-markdown-css in the platform decisions of 13 November 2026 (Q3,
+option B): a browser-compatible ingestion mode for third-party sheets that
+drops what Chromium drops and reports it, with compile-time strictness kept
+for code authored for Div. The spelling below is still this draft's; the
+engine track's RFC decides it.
 
 ```rust
 stylesheet!(github_markdown, "github-markdown.css", compat = Browser);
@@ -137,8 +142,10 @@ impl Document {
   must pass a size, and without one the box is 300×150.
 - **Errors.** A load error fires `error` and lays out as a broken image.
 - **SVG.** SVG images must draw paths, strokes and text: README badges are
-  SVG with text. That is engine paint work, shared with the components
-  track's icon need.
+  SVG with text. The platform decisions of 13 November 2026 (Q9) schedule
+  inline SVG painted Chromium's way (V1) right after the engine's Tier 0,
+  with the stroked-icons item as its stage 1. Request: `<img>` with an SVG
+  source draws through the same painter, not a second one.
 
 ## 6. Links
 
@@ -164,12 +171,16 @@ impl Document {
 
 Reading apps need it, Markdown views first among them.
 
-- **API.** A selection over the document, not only inside form controls:
+- **Model.** Per the platform decisions of 13 November 2026 (Q7), the
+  selection is the editor sample's web-shaped `Range`, `Selection` and
+  `StaticRange` (UTF-8 byte offsets in Rust, UTF-16 at the FFI), owned by
+  the engine. This RFC asks for no second model.
+- **Conveniences on top of it**, which a Markdown view needs:
 
   ```rust
   impl Document {
-      pub fn selection(&self) -> Result<Option<SelectionRange>, Error>;
-      pub fn selected_text(&self) -> Result<String, Error>;  // innerText rules
+      pub fn selection(&self) -> Result<Selection, Error>;     // the web model
+      pub fn selected_text(&self) -> Result<String, Error>;    // innerText rules
       pub fn select_all(&self) -> Result<(), Error>;
   }
   ```

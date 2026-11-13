@@ -1,7 +1,7 @@
 {
  "schema": "sample-markdown-fidelity-v1",
  "chromium": "147.0.7727.50",
- "div_commit": "565db46aa393d29a471973036d1c93d103e3a17a",
+ "div_commit": "92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f",
  "reference_versions": {
   "react-markdown": "10.1.0",
   "remark-gfm": "4.0.1",
@@ -77,6 +77,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 146,
     "image_errors": [],
@@ -336,11 +341,6 @@
      "total": 9,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 2
    }
   },
   {
@@ -409,6 +409,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 146,
     "image_errors": [],
@@ -668,11 +673,6 @@
      "total": 9,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 2
    }
   },
   {
@@ -863,6 +863,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 205,
     "image_errors": [],
@@ -1347,10 +1351,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -1541,6 +1541,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 205,
     "image_errors": [],
@@ -2025,10 +2029,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -2123,6 +2123,13 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "a::before \"[\"": 2,
+    "a::after \"]\"": 2,
+    "li::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 325,
     "image_errors": [],
@@ -2675,13 +2682,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "a::before \"[\"": 2,
-    "a::after \"]\"": 2,
-    "li::marker normal": 2
    }
   },
   {
@@ -2776,6 +2776,13 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "a::before \"[\"": 2,
+    "a::after \"]\"": 2,
+    "li::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 325,
     "image_errors": [],
@@ -3328,13 +3335,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "a::before \"[\"": 2,
-    "a::after \"]\"": 2,
-    "li::marker normal": 2
    }
   },
   {
@@ -3573,6 +3573,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 178,
     "image_errors": [],
@@ -3936,10 +3940,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -4178,6 +4178,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 178,
     "image_errors": [],
@@ -4541,10 +4545,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -4709,6 +4709,12 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "hr::before \"\"": 2,
+    "hr::after \"\"": 2
+   },
    "build_report": {
     "applied_declarations": 118,
     "image_errors": [],
@@ -4906,12 +4912,6 @@
      "total": 7,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "hr::before \"\"": 2,
-    "hr::after \"\"": 2
    }
   },
   {
@@ -5076,6 +5076,12 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "hr::before \"\"": 2,
+    "hr::after \"\"": 2
+   },
    "build_report": {
     "applied_declarations": 118,
     "image_errors": [],
@@ -5273,12 +5279,6 @@
      "total": 7,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "hr::before \"\"": 2,
-    "hr::after \"\"": 2
    }
   },
   {
@@ -5397,6 +5397,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "summary::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 232,
     "image_errors": [],
@@ -5811,11 +5816,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "summary::marker normal": 2
    }
   },
   {
@@ -5934,6 +5934,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "summary::marker normal": 2
+   },
    "build_report": {
     "applied_declarations": 232,
     "image_errors": [],
@@ -6348,11 +6353,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "summary::marker normal": 2
    }
   },
   {
@@ -6495,6 +6495,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 130,
     "image_errors": [],
@@ -6819,10 +6823,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -6965,6 +6965,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 130,
     "image_errors": [],
@@ -7289,10 +7293,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -7387,6 +7387,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 222,
     "image_errors": [],
@@ -7771,10 +7775,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -7869,6 +7869,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 222,
     "image_errors": [],
@@ -8253,10 +8257,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -8375,6 +8375,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 15
+   },
    "build_report": {
     "applied_declarations": 480,
     "image_errors": [],
@@ -9008,11 +9013,6 @@
      "total": 30,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 15
    }
   },
   {
@@ -9131,6 +9131,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 15
+   },
    "build_report": {
     "applied_declarations": 480,
     "image_errors": [],
@@ -9764,11 +9769,6 @@
      "total": 30,
      "differences": []
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 15
    }
   },
   {
@@ -10055,6 +10055,13 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 7,
+    "hr::before \"\"": 1,
+    "hr::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 854,
     "image_errors": [],
@@ -11673,13 +11680,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 7,
-    "hr::before \"\"": 1,
-    "hr::after \"\"": 1
    }
   },
   {
@@ -11966,6 +11966,13 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 7,
+    "hr::before \"\"": 1,
+    "hr::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 854,
     "image_errors": [],
@@ -13584,13 +13591,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 7,
-    "hr::before \"\"": 1,
-    "hr::after \"\"": 1
    }
   },
   {
@@ -13661,6 +13661,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 612,
     "image_errors": [],
@@ -14640,10 +14644,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -14714,6 +14714,10 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1
+   },
    "build_report": {
     "applied_declarations": 612,
     "image_errors": [],
@@ -15693,10 +15697,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1
    }
   },
   {
@@ -15767,6 +15767,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 5
+   },
    "build_report": {
     "applied_declarations": 239,
     "image_errors": [],
@@ -16189,11 +16194,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 5
    }
   },
   {
@@ -16264,6 +16264,11 @@
      }
     }
    },
+   "pseudo_elements": {
+    "article::before \"\"": 1,
+    "article::after \"\"": 1,
+    "li::marker normal": 5
+   },
    "build_report": {
     "applied_declarations": 239,
     "image_errors": [],
@@ -16686,11 +16691,6 @@
       }
      ]
     }
-   },
-   "pseudo_elements": {
-    "article::before \"\"": 1,
-    "article::after \"\"": 1,
-    "li::marker normal": 5
    }
   }
  ]
