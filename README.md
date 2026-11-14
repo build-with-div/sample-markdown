@@ -15,7 +15,9 @@ Status: phase 2. `crates/markdown-tree` ports react-markdown with
 remark-gfm, rehype-raw and, as an option, rehype-sanitize to Rust;
 `crates/markdown-div` mounts the result in Div, and `examples/viewer` is
 a viewer app built on them (screenshots in
-[docs/design.md](docs/design.md#p2-3-result)). See
+[docs/design.md](docs/design.md#p2-3-result)). `crates/markdown-highlight`
+ports Shiki's code highlighting; its tokens and colors equal Shiki's
+([result](docs/design.md#p2-4-result)). See
 [docs/design.md](docs/design.md) for the findings and plan, and
 [docs/rfc-markdown.md](docs/rfc-markdown.md) for the Div APIs it proposes.
 
@@ -25,9 +27,11 @@ a viewer app built on them (screenshots in
 | --- | --- |
 | `fixtures/*.md` | Small GFM documents, one feature each, plus a README-like page |
 | `fixtures/gfm-cases.json` | Short GFM and raw-HTML cases for the tree test |
+| `fixtures/shiki-cases.json` | Code in 11 languages for the highlighting test |
 | `reference/` | `build.mjs` turns each fixture into a Chromium reference page (react-markdown, remark-gfm, rehype-raw, github-markdown-css), light and dark; the pages are committed |
-| `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize |
+| `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize; `shiki.json`, Shiki's tokens for the highlighting cases |
 | `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/` |
+| `crates/markdown-highlight` | A port of Shiki's highlighting (vscode-textmate on Oniguruma) with Shiki's grammars and themes in `data/`, checked against `reference/corpus/shiki.json` |
 | `crates/markdown-div` | Mounts that tree in a Div document through the public API, with a report of what Div cannot take |
 | `examples/viewer` | `markdown-viewer`: open a `.md` file, scroll it, switch the theme. What Div cannot do yet is labeled `div-gap` |
 | `harness/render` | `markdown-render`: builds a page with Div's public API, from a fixture's Markdown or a captured tree, and renders it |
@@ -62,3 +66,7 @@ Div compiles Skia from source; see sample-git's README for the toolchain
 
 Apache-2.0. The reference pages include github-markdown-css (MIT,
 Sindre Sorhus), copied unmodified from the npm package.
+`crates/markdown-highlight/data` holds TextMate grammars and themes copied
+unchanged from `@shikijs/langs` and `@shikijs/themes` (MIT, Shiki); each
+keeps its upstream license, listed by Shiki's tm-grammars and tm-themes
+([data/README.md](crates/markdown-highlight/data/README.md)).

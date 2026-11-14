@@ -17,6 +17,8 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
+import { bundledLanguages, bundledThemes, createHighlighter } from "shiki";
+import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import { createHash } from "node:crypto";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -187,3 +189,99 @@ writeCorpus(
     markdown: test.markdown,
   })),
 );
+
+// Highlighting (crates/markdown-highlight): Shiki's grammars and themes,
+// copied verbatim for the Rust port, and the tokens Shiki makes from them.
+// The languages are loaded in Shiki's order: each bundled language module
+// lists its embedded languages first, and the list is deduplicated.
+const HIGHLIGHT_LANGS = [
+  "rust", "shellscript", "javascript", "typescript", "json", "python",
+  "toml", "yaml", "css", "diff", "html",
+];
+const HIGHLIGHT_THEMES = ["github-light", "github-dark"];
+const highlightData = join(root, "crates", "markdown-highlight", "data");
+const langs = [
+  ...new Set((await Promise.all(HIGHLIGHT_LANGS.map(async (id) => (await bundledLanguages[id]()).default))).flat()),
+];
+const themes = await Promise.all(HIGHLIGHT_THEMES.map(async (id) => (await bundledThemes[id]()).default));
+for (const dir of ["langs", "themes"]) {
+  rmSync(join(highlightData, dir), { recursive: true, force: true });
+  mkdirSync(join(highlightData, dir), { recursive: true });
+}
+for (const lang of langs) {
+  writeFileSync(join(highlightData, "langs", `${lang.name}.json`), JSON.stringify(lang) + "\n");
+}
+for (const theme of themes) {
+  writeFileSync(join(highlightData, "themes", `${theme.name}.json`), JSON.stringify(theme) + "\n");
+}
+const shikiVersions = Object.fromEntries(
+  ["shiki", "@shikijs/langs", "@shikijs/themes", "@shikijs/vscode-textmate", "@shikijs/engine-oniguruma"].map(
+    (name) => [name, JSON.parse(readFileSync(join(modules, name, "package.json"), "utf8")).version],
+  ),
+);
+writeFileSync(
+  join(highlightData, "manifest.json"),
+  JSON.stringify(
+    {
+      schema: "sample-markdown-highlight-data-v1",
+      versions: shikiVersions,
+      langs: langs.map((lang) => lang.name),
+      themes: themes.map((theme) => theme.name),
+    },
+    null,
+    2,
+  ) + "\n",
+);
+
+// The token corpus: fixtures/shiki-cases.json and the fixtures' code
+// blocks (their text as react-markdown renders it, the input a highlighter
+// plugin receives; no language is Shiki's plain "text"), through
+// codeToTokensBase with the Oniguruma engine, once per theme.
+const highlighter = await createHighlighter({
+  themes,
+  langs,
+  engine: createOnigurumaEngine(import("shiki/wasm")),
+});
+const unescapeHtml = (text) =>
+  text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, "&");
+const highlightCases = JSON.parse(readFileSync(join(fixtures, "shiki-cases.json"), "utf8")).map((test) => ({
+  ...test,
+  source: "fixtures/shiki-cases.json",
+}));
+for (const file of readdirSync(fixtures).filter((name) => name.endsWith(".md")).sort()) {
+  const html = render(readFileSync(join(fixtures, file), "utf8").replace(/\r\n/g, "\n"));
+  let index = 0;
+  for (const [, lang, code] of html.matchAll(/<pre><code(?: class="language-([^"]+)")?>([\s\S]*?)<\/code><\/pre>/g)) {
+    index += 1;
+    highlightCases.push({
+      name: `${file} block ${index}`,
+      lang: lang || "text",
+      code: unescapeHtml(code),
+      source: `fixtures/${file}`,
+    });
+  }
+}
+const highlightCorpus = {
+  schema: "sample-markdown-shiki-corpus-v1",
+  versions: shikiVersions,
+  themes: Object.fromEntries(
+    HIGHLIGHT_THEMES.map((id) => {
+      const theme = highlighter.getTheme(id);
+      return [id, { fg: theme.fg, bg: theme.bg }];
+    }),
+  ),
+  cases: highlightCases.map((test) => ({
+    ...test,
+    tokens: Object.fromEntries(
+      HIGHLIGHT_THEMES.map((theme) => [theme, highlighter.codeToTokensBase(test.code, { lang: test.lang, theme })]),
+    ),
+  })),
+};
+writeFileSync(join(here, "corpus", "shiki.json"), JSON.stringify(highlightCorpus, null, 1) + "\n");
+console.log(`wrote ${langs.length} grammars, ${themes.length} themes, ${highlightCases.length} highlighting cases`);
+highlighter.dispose();

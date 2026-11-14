@@ -224,8 +224,9 @@ pub trait Highlighter {
 - **Styling:** `github-markdown-css` compiled with
   `stylesheet!(…, compat = Browser)` and adopted on mount. The theme sets
   `data-theme` or the color scheme.
-- **Highlighting:** a syntect implementation, with Shiki's grammars and
-  themes, ships behind a feature.
+- **Highlighting:** a port of Shiki's tokenizer with Shiki's grammars and
+  themes, as in this sample's `markdown-highlight` (its tokens and colors
+  equal Shiki's), ships behind a feature.
 - **Updates:** a changed source re-renders, keyed by block, so a large
   document does not rebuild on each keystroke.
 
