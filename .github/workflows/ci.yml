@@ -114,7 +114,7 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           node build.mjs
-      - name: The committed pages and corpus match the fixtures and pinned packages
-        run: git diff --exit-code -- reference/pages reference/corpus
+      - name: The committed pages, corpus and highlighting data match the fixtures and pinned packages
+        run: git diff --exit-code -- reference/pages reference/corpus crates/markdown-highlight/data
       - name: Harness scripts compile
         run: python -m py_compile harness/compare.py harness/css_inventory.py harness/summarize.py

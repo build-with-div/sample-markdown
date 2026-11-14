@@ -63,9 +63,10 @@ numbers: [fidelity-results.md](fidelity-results.md), generated from
 In Rust, the parse step belongs to the app or component and needs nothing
 from Div. comrak, a port of GitHub's cmark-gfm, produces GitHub's element
 structure and class names. pulldown-cmark is faster but covers less of
-GFM. Shiki's role maps to syntect, which uses the same TextMate grammars and
-VS Code themes through Oniguruma, and then needs only colored spans. What Div
-must provide is the rendering of that HTML and CSS.
+GFM. Shiki's role is ported in `crates/markdown-highlight`: Shiki's own
+tokenizer on Oniguruma, with Shiki's grammars and themes ([P2-4](#p2-4-result)).
+Its output needs only colored spans. What Div must provide is the rendering
+of that HTML and CSS.
 
 ## How it was measured
 
@@ -169,7 +170,7 @@ read from Div's source.
 | MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally. Measured in the viewer: a click on `<a href="#user-content-fn-1">` leaves the document at scroll position 0 with the footnote 1,188 px down | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
 | MD-18 | GitHub raw HTML → presentational attributes | Read: none | `align` on `p`/`div`/`img`/headings, `width`/`height` on `img` (GitHub strips `style`, so no runtime CSS is needed for parity) | engine (UA preset) | S |
 | MD-19 | the component | – | A `div-markdown` crate: comrak → real elements → `github-markdown-css` compiled by `stylesheet!` ([API](#recommended-component-api)) | components | M (after MD-1, 3, 4) |
-| MD-20 | Shiki → highlighting | Read: colored spans work today (inline `color`) | Nothing in Div for single themes. Shiki's dual themes need MD-5 and MD-6 | components (syntect) | S |
+| MD-20 | Shiki → highlighting | Read: colored spans work today (inline `color`). Measured (P2-4): the port's tokens and colors equal Shiki's | Nothing in Div for single themes. Shiki's dual themes need MD-5 and MD-6 | components (a port of Shiki, as in `markdown-highlight`) | S |
 | MD-21 | KaTeX (stretch) | Read: `register_font_face` exists; WOFF2 fails on Linux with the census FreeType (components track); SVG `path` fill not drawn | `@font-face` in sheets, WOFF2 decode on Linux, SVG paths (V1), exact inline-block baselines | engine | L |
 | MD-23 | all → keyboard scrolling | Measured in the viewer (headless dispatch, `Document::dispatch_key`): PageDown, ArrowDown, Space and End leave a scroll container at 0, after a click in it and when it has focus. Without `tabindex`, `focus()` on it fails (`NotFocusable`). Read: no key in div-engine or divui has a scrolling default action. The wheel scrolls it (120 px per notch) | Keyboard scrolling of the focused or last-clicked scroller, and of the viewport: arrows, Page Up/Down, Space/Shift+Space, Home/End, as Chromium does. Scrollers without focusable content are keyboard-focusable, as in Chromium since 130 | engine (default actions) + framework (key routing) | M |
 | MD-22 | Mermaid (stretch) | Div has no JavaScript by design | A Rust port of the layout (dagre) plus SVG text, strokes and markers (V1 stages); or pre-rendered SVG. Defer | components + engine | L |
@@ -189,7 +190,7 @@ view! {
         theme=MarkdownTheme::System        // github-markdown-css light/dark/auto
         base_url={file_url}                // relative images and links
         on_navigate={|link| open(link)}    // external links; #fragments scroll
-        highlight={syntect_highlighter()}  // optional
+        highlight={shiki_highlighter()}    // optional
     />
 }
 ```
@@ -265,7 +266,8 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown. Done: `parse_with(…, Options { sanitize: true })`, measured in the [P2-1 result](#p2-1-result) | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree. Done: [result](#p2-2-result) | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17). Done: [result](#p2-3-result) | – | Screenshots; interaction traces where Div's test input helpers allow |
-| P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
+| P2-4 | Highlighting: Shiki's tokenizer (`@shikijs/vscode-textmate`) ported to Rust on Oniguruma, with Shiki's grammars and themes, producing Shiki's tokens. Planned on syntect; changed, for the reasons in the result. Done: [result](#p2-4-result) | Shiki | Token and color equality with Shiki's output |
+| P2-4b | Highlighted code blocks: Shiki's spans in the reference pages, and the port's spans mounted in Div | Shiki | Pixels of colored code blocks in computed mode |
 | P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
 | P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
 
@@ -414,6 +416,58 @@ Screenshots (headless, Linux):
 The windowed build (`--features windows`) was built and its first frame
 rendered through `DIV_RENDER_PNG` on Windows. The dialog and window were
 not driven, since no automation of a native window was available here.
+
+### P2-4 result
+
+`crates/markdown-highlight` ports Shiki 4.6.0's `codeToTokensBase` with
+the Oniguruma engine:
+- **Tokenizer:** `@shikijs/vscode-textmate` 10.1.0, Shiki's fork of
+  vscode-textmate, file by file. That covers rules and their regex lists,
+  the line tokenizer with begin/end and begin/while rules, captures and
+  retokenized captures, injections, scope selectors, the theme trie and
+  token metadata.
+- **Regexes:** the `onig` crate's Oniguruma 6.9.10 (`onig_sys` 69.9.3).
+  Patterns compile as vscode-oniguruma compiles them for Shiki: capture
+  groups on, UTF-8, Oniguruma syntax. A search returns the earliest match,
+  and on a tie the first pattern.
+- **Shiki:** its primitive's registry (load order, aliases, bracket
+  selectors), `normalizeTheme` and the per-line token loop, quirks
+  included (an empty line does not advance the grammar state).
+- **Data:** Shiki's grammars for 11 languages and the github-light and
+  github-dark themes. `reference/build.mjs` copies them unchanged from
+  `@shikijs/langs` and `@shikijs/themes` into
+  `crates/markdown-highlight/data`.
+
+Measured by `cargo test -p markdown-highlight` on Windows and Linux. The
+reference is `reference/corpus/shiki.json`, which `reference/build.mjs`
+writes with Shiki itself:
+
+| Input | Equal to Shiki | Listed differences |
+| --- | --- | --- |
+| The 15 cases of `fixtures/shiki-cases.json` and the fixtures' 4 code blocks, each in both themes | 38/38 case-theme pairs (2,729 tokens, compared by content, offset, color and font style) | none |
+
+The cases cover Rust, shell, JavaScript, TypeScript, JSON, Python, TOML,
+YAML, CSS, diff, HTML with embedded script and style (injections and
+embedded grammars), a language alias, CRLF line endings, non-ASCII text
+and plain text.
+
+**Changed from the plan.** P2-4 was planned on syntect. syntect reads
+Sublime Text's `.sublime-syntax` format, not the TextMate JSON grammars
+Shiki ships, and its engine is not vscode-textmate. Its tokens would be a
+re-creation of Shiki's, not Shiki's. giallo 0.6, a Rust TextMate engine
+that reads Shiki's grammars, runs them on fancy-regex and replaces the
+patterns it cannot compile with patterns that never match. The port runs
+Shiki's own algorithm on Oniguruma, the engine Shiki uses.
+
+**Not covered.** Shiki's `tokenizeTimeLimit` (500 ms a line) depends on
+speed, so a line where Shiki stops early may differ. The Oniguruma version
+inside Shiki's `onig.wasm` was not identified; the port uses 6.9.10.
+
+**Not done here (P2-4b).** Highlighted code blocks in the reference pages
+and in Div were not measured. The pages, the harness and the pin did not
+change, so the yardstick was not rerun. Div gaps: none new. MD-20 is
+unchanged: inline `color` is all a single theme needs, and Shiki's dual
+themes need MD-5 and MD-6.
 
 ### Yardstick history
 

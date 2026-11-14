@@ -1,0 +1,27 @@
+{
+  "schema": "sample-markdown-highlight-data-v1",
+  "versions": {
+    "shiki": "4.6.0",
+    "@shikijs/langs": "4.6.0",
+    "@shikijs/themes": "4.6.0",
+    "@shikijs/vscode-textmate": "10.1.0",
+    "@shikijs/engine-oniguruma": "4.6.0"
+  },
+  "langs": [
+    "rust",
+    "shellscript",
+    "javascript",
+    "typescript",
+    "json",
+    "python",
+    "toml",
+    "yaml",
+    "css",
+    "diff",
+    "html"
+  ],
+  "themes": [
+    "github-light",
+    "github-dark"
+  ]
+}
