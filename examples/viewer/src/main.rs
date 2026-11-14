@@ -14,7 +14,8 @@
 //! What a browser would do and Div cannot yet is labeled `div-gap` in the
 //! code and listed in `docs/framework-gaps.md`: link activation (MD-17),
 //! the system theme and the package's colors (MD-4, MD-5, MD-6), image
-//! sizes (MD-15) and the elements Div lacks (MD-1).
+//! sizes (MD-15), the elements Div lacks (MD-1) and the colors of
+//! highlighted code, which are in `style` attributes (MD-24).
 
 mod viewer;
 

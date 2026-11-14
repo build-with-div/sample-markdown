@@ -224,3 +224,109 @@ fn collect_image_sizes(element: &Element, sizes: &mut Vec<(f32, f32)>) {
         child = element.next_sibling().unwrap();
     }
 }
+
+/// The `class` of every element under `element` that has one, in tree
+/// order.
+fn classes(element: &Element, out: &mut Vec<String>) {
+    if let Some(class) = element.get_attribute("class").unwrap() {
+        out.push(class);
+    }
+    let mut child = element.first_child().unwrap();
+    while let Some(element) = child {
+        classes(&element, out);
+        child = element.next_sibling().unwrap();
+    }
+}
+
+fn shiki_blocks(viewer: &Viewer) -> Vec<String> {
+    let mut all = Vec::new();
+    classes(&viewer.article, &mut all);
+    all.retain(|class| class.starts_with("shiki "));
+    all
+}
+
+#[test]
+fn code_blocks_are_highlighted_with_the_theme() {
+    let viewer = viewer();
+    viewer.open(&fixture("code.md")).unwrap();
+    viewer.document.update_all().unwrap();
+    // code.md has one block in a loaded language (`rust`); the others have
+    // no language and stay as they are, as on the reference pages.
+    assert_eq!(shiki_blocks(&viewer), ["shiki github-light"]);
+    let light = viewer.article.text_content().unwrap();
+    click(&viewer.document, centre(&viewer.theme_button));
+    assert_eq!(viewer.theme(), Theme::Dark);
+    assert_eq!(shiki_blocks(&viewer), ["shiki github-dark"]);
+    assert_eq!(viewer.article.text_content().unwrap(), light);
+    // The same tree the reference pages' pipeline builds for the theme.
+    let highlighter = Highlighter::bundled();
+    let highlight = RehypeShiki {
+        highlighter: &highlighter,
+        theme: "github-dark",
+    };
+    let nodes = markdown_tree::parse_with(
+        &std::fs::read_to_string(fixture("code.md"))
+            .unwrap()
+            .replace("\r\n", "\n"),
+        Options {
+            highlight: Some(&highlight),
+            ..Options::default()
+        },
+    );
+    assert_eq!(light, nodes.iter().map(text).collect::<String>());
+}
+
+#[test]
+fn switching_the_theme_keeps_the_scroll_position() {
+    let path = long_document();
+    let mut markdown = std::fs::read_to_string(&path).unwrap();
+    markdown.push_str("\n```rust\nfn main() {}\n```\n");
+    std::fs::write(&path, markdown).unwrap();
+    let viewer = viewer();
+    viewer.open(&path).unwrap();
+    viewer.document.update_all().unwrap();
+    let (x, y) = centre(&viewer.scroller);
+    viewer
+        .document
+        .dispatch_wheel_event(x, y, 0.0, 240.0, Modifiers::NONE)
+        .unwrap();
+    viewer.document.update_all().unwrap();
+    assert_eq!(viewer.scroller.scroll_top().unwrap(), 240.0);
+    viewer.set_theme(Theme::Dark).unwrap();
+    viewer.document.update_all().unwrap();
+    assert_eq!(shiki_blocks(&viewer), ["shiki github-dark"]);
+    assert_eq!(viewer.scroller.scroll_top().unwrap(), 240.0);
+}
+
+/// MD-24: the highlighted code is mounted with Shiki's colors in `style`
+/// attributes, and Div does not apply them: a token shows the color it
+/// inherits.
+#[test]
+fn div_gap_md24_highlighted_code_shows_no_color() {
+    let viewer = viewer();
+    viewer.open(&fixture("code.md")).unwrap();
+    viewer.document.update_all().unwrap();
+    let mut colored = Vec::new();
+    collect_styled(&viewer.article, &mut colored);
+    // `let`, github-light's keyword color.
+    let keyword = colored
+        .iter()
+        .find(|(style, _)| style == "color:#D73A49")
+        .expect("a keyword span");
+    let article = format!("{:?}", viewer.article.computed_style().unwrap().color);
+    assert_eq!(keyword.1, article);
+}
+
+fn collect_styled(element: &Element, out: &mut Vec<(String, String)>) {
+    if let Some(style) = element.get_attribute("style").unwrap() {
+        out.push((
+            style,
+            format!("{:?}", element.computed_style().unwrap().color),
+        ));
+    }
+    let mut child = element.first_child().unwrap();
+    while let Some(element) = child {
+        collect_styled(&element, out);
+        child = element.next_sibling().unwrap();
+    }
+}

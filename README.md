@@ -35,7 +35,7 @@ Div does not apply their colors yet (MD-24). See
 | `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/corpus/` |
 | `crates/markdown-highlight` | A port of Shiki's highlighting (vscode-textmate on Oniguruma) with Shiki's grammars and themes in `data/`, and `codeToHast` for `markdown-tree`; checked against `reference/corpus/shiki.json`, `rehype-shiki.json` and the reference pages |
 | `crates/markdown-div` | Mounts that tree in a Div document through the public API, with a report of what Div cannot take |
-| `examples/viewer` | `markdown-viewer`: open a `.md` file, scroll it, switch the theme. What Div cannot do yet is labeled `div-gap` |
+| `examples/viewer` | `markdown-viewer`: open a `.md` file, scroll it, switch the theme; code blocks are highlighted with the theme's Shiki theme. What Div cannot do yet is labeled `div-gap` |
 | `harness/render` | `markdown-render`: builds a page with Div's public API, from a fixture's Markdown or a captured tree, and renders it |
 | `harness/compare.py` | Captures each page in pinned Chromium, renders it with Div, compares pixels and element boxes |
 | `harness/css_inventory.py` | Lists the selectors, at-rules, properties and functions a stylesheet uses |
