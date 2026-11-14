@@ -6,6 +6,7 @@
   "react-markdown": "10.1.0",
   "remark-gfm": "4.0.1",
   "rehype-raw": "7.0.0",
+  "rehype-sanitize": "6.0.0",
   "react": "19.3.1",
   "react-dom": "19.3.1",
   "github-markdown-css": "5.9.0"
@@ -83,17 +84,13 @@
     "li::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 146,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 2,
-      "property": "border-left-width",
-      "value": "4px"
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 2
      }
     ],
-    "refused_values": [],
-    "rejected_values": [],
     "unknown_properties": {
      "-webkit-locale": 9,
      "-webkit-text-stroke-color": 8,
@@ -116,13 +113,29 @@
      "padding-inline-end": 3,
      "padding-inline-start": 4
     },
-    "unknown_tags": [
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [
      {
-      "count": 2,
-      "stand_in": "div",
-      "tag": "blockquote"
+      "property": "border-left-width",
+      "value": "4px",
+      "count": 2
      }
-    ]
+    ],
+    "applied_declarations": 146,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 2
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -415,17 +428,13 @@
     "li::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 146,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 2,
-      "property": "border-left-width",
-      "value": "4px"
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 2
      }
     ],
-    "refused_values": [],
-    "rejected_values": [],
     "unknown_properties": {
      "-webkit-locale": 9,
      "-webkit-text-stroke-color": 8,
@@ -448,13 +457,29 @@
      "padding-inline-end": 3,
      "padding-inline-start": 4
     },
-    "unknown_tags": [
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [
      {
-      "count": 2,
-      "stand_in": "div",
-      "tag": "blockquote"
+      "property": "border-left-width",
+      "value": "4px",
+      "count": 2
      }
-    ]
+    ],
+    "applied_declarations": 146,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 2
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -868,34 +893,16 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 205,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
+    "unknown_tags": [
      {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 3
      },
      {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 3
      }
     ],
     "unknown_properties": {
@@ -924,18 +931,53 @@
      "padding-inline-end": 4,
      "padding-inline-start": 4
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 3,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 6
      },
      {
-      "count": 3,
-      "stand_in": "div",
-      "tag": "pre"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 6
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 6
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 6
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 205,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 3
+     },
+     {
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 3
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -1546,34 +1588,16 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 205,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
+    "unknown_tags": [
      {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 3
      },
      {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 6,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 3
      }
     ],
     "unknown_properties": {
@@ -1602,18 +1626,53 @@
      "padding-inline-end": 4,
      "padding-inline-start": 4
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 3,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 6
      },
      {
-      "count": 3,
-      "stand_in": "div",
-      "tag": "pre"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 6
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 6
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 6
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 205,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 3
+     },
+     {
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 3
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -2131,56 +2190,16 @@
     "li::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 325,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 1,
-      "property": "border-bottom-width",
-      "value": "1px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 1,
-      "property": "border-top-width",
-      "value": "1px"
-     },
-     {
-      "count": 8,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 8,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 2
      }
     ],
     "unknown_properties": {
@@ -2215,18 +2234,75 @@
      "padding-inline-end": 2,
      "padding-inline-start": 3
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
      },
      {
-      "count": 2,
-      "stand_in": "span",
-      "tag": "sup"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 8
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 1
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 8
+     }
+    ],
+    "applied_declarations": 325,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 2
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -2784,56 +2860,16 @@
     "li::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 325,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 1,
-      "property": "border-bottom-width",
-      "value": "1px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 1,
-      "property": "border-top-width",
-      "value": "1px"
-     },
-     {
-      "count": 8,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 8,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 2
      }
     ],
     "unknown_properties": {
@@ -2868,18 +2904,75 @@
      "padding-inline-end": 2,
      "padding-inline-start": 3
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
      },
      {
-      "count": 2,
-      "stand_in": "span",
-      "tag": "sup"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 8
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 1
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 8
+     }
+    ],
+    "applied_declarations": 325,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 2
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -3578,17 +3671,7 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 178,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 2,
-      "property": "border-bottom-width",
-      "value": "1px"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 10,
      "-webkit-text-stroke-color": 9,
@@ -3611,7 +3694,23 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 2
+     }
+    ],
+    "applied_declarations": 178,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -4183,17 +4282,7 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 178,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 2,
-      "property": "border-bottom-width",
-      "value": "1px"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 10,
      "-webkit-text-stroke-color": 9,
@@ -4216,7 +4305,23 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 2
+     }
+    ],
+    "applied_declarations": 178,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -4716,11 +4821,7 @@
     "hr::after \"\"": 2
    },
    "build_report": {
-    "applied_declarations": 118,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 7,
      "-webkit-text-stroke-color": 6,
@@ -4743,7 +4844,17 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 118,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -5083,11 +5194,7 @@
     "hr::after \"\"": 2
    },
    "build_report": {
-    "applied_declarations": 118,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 7,
      "-webkit-text-stroke-color": 6,
@@ -5110,7 +5217,17 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 118,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -5403,64 +5520,21 @@
     "summary::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 232,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 2,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "kbd",
+      "stand_in": "span",
+      "count": 2
      },
      {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
+      "tag": "sub",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `list-item 0` for `counter-increment` (expected Vec<CounterOperation>)",
-      "property": "counter-increment",
-      "value": "list-item 0"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `inside` for `list-style-position` (expected ListStylePosition)",
-      "property": "list-style-position",
-      "value": "inside"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `disclosure-closed` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "disclosure-closed"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `disclosure-open` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "disclosure-open"
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -5491,23 +5565,88 @@
      "padding-inline-end": 3,
      "padding-inline-start": 3
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 2,
-      "stand_in": "span",
-      "tag": "kbd"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 2
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "sub"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 2
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "sup"
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 2
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 2
+     },
+     {
+      "property": "counter-increment",
+      "value": "list-item 0",
+      "error": "invalid literal `list-item 0` for `counter-increment` (expected Vec<CounterOperation>)",
+      "count": 2
+     },
+     {
+      "property": "list-style-position",
+      "value": "inside",
+      "error": "invalid literal `inside` for `list-style-position` (expected ListStylePosition)",
+      "count": 2
+     },
+     {
+      "property": "list-style-type",
+      "value": "disclosure-closed",
+      "error": "invalid literal `disclosure-closed` for `list-style` (expected ListStyleType)",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "disclosure-open",
+      "error": "invalid literal `disclosure-open` for `list-style` (expected ListStyleType)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 2
+     }
+    ],
+    "applied_declarations": 232,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "kbd",
+      "stand_in": "span",
+      "count": 2
+     },
+     {
+      "tag": "sub",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -5940,64 +6079,21 @@
     "summary::marker normal": 2
    },
    "build_report": {
-    "applied_declarations": 232,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 2,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "kbd",
+      "stand_in": "span",
+      "count": 2
      },
      {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
+      "tag": "sub",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `list-item 0` for `counter-increment` (expected Vec<CounterOperation>)",
-      "property": "counter-increment",
-      "value": "list-item 0"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `inside` for `list-style-position` (expected ListStylePosition)",
-      "property": "list-style-position",
-      "value": "inside"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `disclosure-closed` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "disclosure-closed"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `disclosure-open` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "disclosure-open"
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -6028,23 +6124,88 @@
      "padding-inline-end": 3,
      "padding-inline-start": 3
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 2,
-      "stand_in": "span",
-      "tag": "kbd"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 2
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "sub"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 2
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "sup"
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 2
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 2
+     },
+     {
+      "property": "counter-increment",
+      "value": "list-item 0",
+      "error": "invalid literal `list-item 0` for `counter-increment` (expected Vec<CounterOperation>)",
+      "count": 2
+     },
+     {
+      "property": "list-style-position",
+      "value": "inside",
+      "error": "invalid literal `inside` for `list-style-position` (expected ListStylePosition)",
+      "count": 2
+     },
+     {
+      "property": "list-style-type",
+      "value": "disclosure-closed",
+      "error": "invalid literal `disclosure-closed` for `list-style` (expected ListStyleType)",
+      "count": 1
+     },
+     {
+      "property": "list-style-type",
+      "value": "disclosure-open",
+      "error": "invalid literal `disclosure-open` for `list-style` (expected ListStyleType)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 2
+     }
+    ],
+    "applied_declarations": 232,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "kbd",
+      "stand_in": "span",
+      "count": 2
+     },
+     {
+      "tag": "sub",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "sup",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -6365,7 +6526,7 @@
     "800x600@1x": {
      "semantic": {
       "status": "different",
-      "mismatched_pixels": 31009,
+      "mismatched_pixels": 89435,
       "pixels": 480000,
       "max_channel_delta": 255,
       "blocks": [
@@ -6373,25 +6534,25 @@
         "index": 2,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 1899
+        "mismatched_pixels": 5928
        },
        {
         "index": 3,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 9901
+        "mismatched_pixels": 19313
        },
        {
         "index": 5,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 752
+        "mismatched_pixels": 5928
        },
        {
         "index": 6,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 6144
+        "mismatched_pixels": 15012
        }
       ]
      },
@@ -6431,7 +6592,7 @@
     "800x600@2x": {
      "semantic": {
       "status": "different",
-      "mismatched_pixels": 122005,
+      "mismatched_pixels": 356214,
       "pixels": 1920000,
       "max_channel_delta": 255,
       "blocks": [
@@ -6439,25 +6600,25 @@
         "index": 2,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 7325
+        "mismatched_pixels": 23712
        },
        {
         "index": 3,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 39604
+        "mismatched_pixels": 77199
        },
        {
         "index": 5,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 2292
+        "mismatched_pixels": 23712
        },
        {
         "index": 6,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 24576
+        "mismatched_pixels": 59934
        }
       ]
      },
@@ -6500,18 +6661,7 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 130,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 2,
-      "error": "invalid literal `content-box` for `overflow-clip-margin` (expected f32)",
-      "property": "overflow-clip-margin",
-      "value": "content-box"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 8,
      "-webkit-text-stroke-color": 7,
@@ -6534,7 +6684,24 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "overflow-clip-margin",
+      "value": "content-box",
+      "error": "invalid literal `content-box` for `overflow-clip-margin` (expected f32)",
+      "count": 2
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 130,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -6572,9 +6739,9 @@
         0.0,
         0.0,
         800.0,
-        190.0
+        346.0
        ],
-       "max_delta": 154.0
+       "max_delta": 16.0
       },
       {
        "index": 1,
@@ -6589,9 +6756,9 @@
         0.0,
         0.0,
         800.0,
-        190.0
+        346.0
        ],
-       "max_delta": 154.0
+       "max_delta": 16.0
       },
       {
        "index": 2,
@@ -6623,7 +6790,7 @@
         0.0,
         19.0,
         800.0,
-        84.0
+        154.0
        ],
        "max_delta": 106.0
       },
@@ -6639,10 +6806,10 @@
        "div": [
         0.0,
         19.0,
-        120.0,
-        80.0
+        300.0,
+        150.0
        ],
-       "max_delta": 74.0
+       "max_delta": 180.0
       },
       {
        "index": 5,
@@ -6655,7 +6822,7 @@
        ],
        "div": [
         0.0,
-        103.0,
+        173.0,
         800.0,
         19.0
        ],
@@ -6672,11 +6839,11 @@
        ],
        "div": [
         0.0,
-        122.0,
+        192.0,
         800.0,
-        68.0
+        154.0
        ],
-       "max_delta": 114.0
+       "max_delta": 106.0
       },
       {
        "index": 7,
@@ -6689,11 +6856,11 @@
        ],
        "div": [
         0.0,
-        122.0,
-        96.0,
-        64.0
+        192.0,
+        300.0,
+        150.0
        ],
-       "max_delta": 114.0
+       "max_delta": 204.0
       }
      ]
     },
@@ -6835,7 +7002,7 @@
     "800x600@1x": {
      "semantic": {
       "status": "different",
-      "mismatched_pixels": 271186,
+      "mismatched_pixels": 269909,
       "pixels": 480000,
       "max_channel_delta": 255,
       "blocks": [
@@ -6861,7 +7028,7 @@
         "index": 6,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 49274
+        "mismatched_pixels": 46749
        }
       ]
      },
@@ -6901,7 +7068,7 @@
     "800x600@2x": {
      "semantic": {
       "status": "different",
-      "mismatched_pixels": 1084424,
+      "mismatched_pixels": 1079202,
       "pixels": 1920000,
       "max_channel_delta": 255,
       "blocks": [
@@ -6927,7 +7094,7 @@
         "index": 6,
         "tag": "p",
         "status": "different",
-        "mismatched_pixels": 197096
+        "mismatched_pixels": 186882
        }
       ]
      },
@@ -6970,18 +7137,7 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 130,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 2,
-      "error": "invalid literal `content-box` for `overflow-clip-margin` (expected f32)",
-      "property": "overflow-clip-margin",
-      "value": "content-box"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 8,
      "-webkit-text-stroke-color": 7,
@@ -7004,7 +7160,24 @@
      "padding-inline-end": 1,
      "padding-inline-start": 1
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "overflow-clip-margin",
+      "value": "content-box",
+      "error": "invalid literal `content-box` for `overflow-clip-margin` (expected f32)",
+      "count": 2
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 130,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -7042,9 +7215,9 @@
         0.0,
         0.0,
         800.0,
-        190.0
+        346.0
        ],
-       "max_delta": 154.0
+       "max_delta": 16.0
       },
       {
        "index": 1,
@@ -7059,9 +7232,9 @@
         0.0,
         0.0,
         800.0,
-        190.0
+        346.0
        ],
-       "max_delta": 154.0
+       "max_delta": 16.0
       },
       {
        "index": 2,
@@ -7093,7 +7266,7 @@
         0.0,
         19.0,
         800.0,
-        84.0
+        154.0
        ],
        "max_delta": 106.0
       },
@@ -7109,10 +7282,10 @@
        "div": [
         0.0,
         19.0,
-        120.0,
-        80.0
+        300.0,
+        150.0
        ],
-       "max_delta": 74.0
+       "max_delta": 180.0
       },
       {
        "index": 5,
@@ -7125,7 +7298,7 @@
        ],
        "div": [
         0.0,
-        103.0,
+        173.0,
         800.0,
         19.0
        ],
@@ -7142,11 +7315,11 @@
        ],
        "div": [
         0.0,
-        122.0,
+        192.0,
         800.0,
-        68.0
+        154.0
        ],
-       "max_delta": 114.0
+       "max_delta": 106.0
       },
       {
        "index": 7,
@@ -7159,11 +7332,11 @@
        ],
        "div": [
         0.0,
-        122.0,
-        96.0,
-        64.0
+        192.0,
+        300.0,
+        150.0
        ],
-       "max_delta": 114.0
+       "max_delta": 204.0
       }
      ]
     },
@@ -7392,34 +7565,16 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 222,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
+    "unknown_tags": [
      {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -7447,18 +7602,53 @@
      "padding-inline-end": 2,
      "padding-inline-start": 2
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "del"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 222,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -7874,34 +8064,16 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 222,
-    "image_errors": [],
-    "normalized_values": [],
-    "refused_values": [],
-    "rejected_values": [
+    "unknown_tags": [
      {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -7929,18 +8101,53 @@
      "padding-inline-end": 2,
      "padding-inline-start": 2
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "del"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [],
+    "applied_declarations": 222,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -8381,42 +8588,7 @@
     "li::marker normal": 15
    },
    "build_report": {
-    "applied_declarations": 480,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 19,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 3,
-      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "circle"
-     },
-     {
-      "count": 11,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
-     },
-     {
-      "count": 3,
-      "error": "invalid literal `lower-roman` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "lower-roman"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `square` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "square"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 30,
      "-webkit-text-stroke-color": 29,
@@ -8437,7 +8609,48 @@
      "padding-inline-end": 1,
      "padding-inline-start": 7
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "list-style-type",
+      "value": "circle",
+      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
+      "count": 3
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 11
+     },
+     {
+      "property": "list-style-type",
+      "value": "lower-roman",
+      "error": "invalid literal `lower-roman` for `list-style` (expected ListStyleType)",
+      "count": 3
+     },
+     {
+      "property": "list-style-type",
+      "value": "square",
+      "error": "invalid literal `square` for `list-style` (expected ListStyleType)",
+      "count": 2
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 19
+     }
+    ],
+    "applied_declarations": 480,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -9137,42 +9350,7 @@
     "li::marker normal": 15
    },
    "build_report": {
-    "applied_declarations": 480,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 19,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 3,
-      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "circle"
-     },
-     {
-      "count": 11,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
-     },
-     {
-      "count": 3,
-      "error": "invalid literal `lower-roman` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "lower-roman"
-     },
-     {
-      "count": 2,
-      "error": "invalid literal `square` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "square"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 30,
      "-webkit-text-stroke-color": 29,
@@ -9193,7 +9371,48 @@
      "padding-inline-end": 1,
      "padding-inline-start": 7
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "list-style-type",
+      "value": "circle",
+      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
+      "count": 3
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 11
+     },
+     {
+      "property": "list-style-type",
+      "value": "lower-roman",
+      "error": "invalid literal `lower-roman` for `list-style` (expected ListStyleType)",
+      "count": 3
+     },
+     {
+      "property": "list-style-type",
+      "value": "square",
+      "error": "invalid literal `square` for `list-style` (expected ListStyleType)",
+      "count": 2
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 19
+     }
+    ],
+    "applied_declarations": 480,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -10063,77 +10282,26 @@
     "hr::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 854,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 9,
-      "property": "border-bottom-width",
-      "value": "1px"
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 1
      },
      {
-      "count": 6,
-      "property": "border-left-width",
-      "value": "1px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 4
      },
      {
-      "count": 1,
-      "property": "border-left-width",
-      "value": "4px"
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 6,
-      "property": "border-right-width",
-      "value": "1px"
-     },
-     {
-      "count": 9,
-      "property": "border-top-width",
-      "value": "1px"
-     },
-     {
-      "count": 8,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 4,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
-      "property": "width",
-      "value": "max-content"
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -10172,28 +10340,106 @@
      "padding-inline-end": 12,
      "padding-inline-start": 14
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "div",
-      "tag": "blockquote"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 4,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "del"
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 1,
-      "stand_in": "div",
-      "tag": "pre"
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 5
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 4
+     },
+     {
+      "property": "width",
+      "value": "max-content",
+      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 9
+     },
+     {
+      "property": "border-left-width",
+      "value": "1px",
+      "count": 6
+     },
+     {
+      "property": "border-left-width",
+      "value": "4px",
+      "count": 1
+     },
+     {
+      "property": "border-right-width",
+      "value": "1px",
+      "count": 6
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 9
+     },
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 8
+     }
+    ],
+    "applied_declarations": 854,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 1
+     },
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 4
+     },
+     {
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -11974,77 +12220,26 @@
     "hr::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 854,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 9,
-      "property": "border-bottom-width",
-      "value": "1px"
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 1
      },
      {
-      "count": 6,
-      "property": "border-left-width",
-      "value": "1px"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 4
      },
      {
-      "count": 1,
-      "property": "border-left-width",
-      "value": "4px"
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
      },
      {
-      "count": 6,
-      "property": "border-right-width",
-      "value": "1px"
-     },
-     {
-      "count": 9,
-      "property": "border-top-width",
-      "value": "1px"
-     },
-     {
-      "count": 8,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 5,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 4,
-      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "decimal"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
-      "property": "width",
-      "value": "max-content"
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -12083,28 +12278,106 @@
      "padding-inline-end": 12,
      "padding-inline-start": 14
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "div",
-      "tag": "blockquote"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 4,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "del"
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 5
      },
      {
-      "count": 1,
-      "stand_in": "div",
-      "tag": "pre"
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 5
+     },
+     {
+      "property": "list-style-type",
+      "value": "decimal",
+      "error": "invalid literal `decimal` for `list-style` (expected ListStyleType)",
+      "count": 4
+     },
+     {
+      "property": "width",
+      "value": "max-content",
+      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 9
+     },
+     {
+      "property": "border-left-width",
+      "value": "1px",
+      "count": 6
+     },
+     {
+      "property": "border-left-width",
+      "value": "4px",
+      "count": 1
+     },
+     {
+      "property": "border-right-width",
+      "value": "1px",
+      "count": 6
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 9
+     },
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 8
+     }
+    ],
+    "applied_declarations": 854,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "blockquote",
+      "stand_in": "div",
+      "count": 1
+     },
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 4
+     },
+     {
+      "tag": "del",
+      "stand_in": "span",
+      "count": 1
+     },
+     {
+      "tag": "pre",
+      "stand_in": "div",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -13666,61 +13939,11 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 612,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 12,
-      "property": "border-bottom-width",
-      "value": "1px"
-     },
-     {
-      "count": 12,
-      "property": "border-left-width",
-      "value": "1px"
-     },
-     {
-      "count": 12,
-      "property": "border-right-width",
-      "value": "1px"
-     },
-     {
-      "count": 16,
-      "property": "border-top-width",
-      "value": "1px"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
-      "property": "width",
-      "value": "max-content"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -13757,13 +13980,75 @@
      "padding-inline-end": 14,
      "padding-inline-start": 14
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "width",
+      "value": "max-content",
+      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-left-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-right-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 16
+     }
+    ],
+    "applied_declarations": 612,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -14719,61 +15004,11 @@
     "article::after \"\"": 1
    },
    "build_report": {
-    "applied_declarations": 612,
-    "image_errors": [],
-    "normalized_values": [
+    "unknown_tags": [
      {
-      "count": 12,
-      "property": "border-bottom-width",
-      "value": "1px"
-     },
-     {
-      "count": 12,
-      "property": "border-left-width",
-      "value": "1px"
-     },
-     {
-      "count": 12,
-      "property": "border-right-width",
-      "value": "1px"
-     },
-     {
-      "count": 16,
-      "property": "border-top-width",
-      "value": "1px"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
-      "property": "border-bottom-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
-      "property": "border-bottom-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
-      "property": "border-top-left-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
-      "property": "border-top-right-radius",
-      "value": "6px"
-     },
-     {
-      "count": 1,
-      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
-      "property": "width",
-      "value": "max-content"
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
      }
     ],
     "unknown_properties": {
@@ -14810,13 +15045,75 @@
      "padding-inline-end": 14,
      "padding-inline-start": 14
     },
-    "unknown_tags": [
+    "rejected_values": [
      {
-      "count": 1,
-      "stand_in": "span",
-      "tag": "code"
+      "property": "border-bottom-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-bottom-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-bottom-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-left-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-left-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "border-top-right-radius",
+      "value": "6px",
+      "error": "invalid literal `6px` for `border-top-right-radius` (expected (f32, f32))",
+      "count": 1
+     },
+     {
+      "property": "width",
+      "value": "max-content",
+      "error": "invalid literal `max-content` for `width` (expected LengthValue)",
+      "count": 1
      }
-    ]
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "border-bottom-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-left-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-right-width",
+      "value": "1px",
+      "count": 12
+     },
+     {
+      "property": "border-top-width",
+      "value": "1px",
+      "count": 16
+     }
+    ],
+    "applied_declarations": 612,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [
+     {
+      "tag": "code",
+      "stand_in": "span",
+      "count": 1
+     }
+    ],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -15773,24 +16070,7 @@
     "li::marker normal": 5
    },
    "build_report": {
-    "applied_declarations": 239,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 11,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "circle"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 14,
      "-webkit-text-stroke-color": 13,
@@ -15812,7 +16092,30 @@
      "padding-inline-end": 1,
      "padding-inline-start": 3
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "list-style-type",
+      "value": "circle",
+      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
+      "count": 1
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 11
+     }
+    ],
+    "applied_declarations": 239,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {
@@ -16270,24 +16573,7 @@
     "li::marker normal": 5
    },
    "build_report": {
-    "applied_declarations": 239,
-    "image_errors": [],
-    "normalized_values": [
-     {
-      "count": 11,
-      "property": "list-style-type",
-      "value": "(name)"
-     }
-    ],
-    "refused_values": [],
-    "rejected_values": [
-     {
-      "count": 1,
-      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
-      "property": "list-style-type",
-      "value": "circle"
-     }
-    ],
+    "unknown_tags": [],
     "unknown_properties": {
      "-webkit-locale": 14,
      "-webkit-text-stroke-color": 13,
@@ -16309,7 +16595,30 @@
      "padding-inline-end": 1,
      "padding-inline-start": 3
     },
-    "unknown_tags": []
+    "rejected_values": [
+     {
+      "property": "list-style-type",
+      "value": "circle",
+      "error": "invalid literal `circle` for `list-style` (expected ListStyleType)",
+      "count": 1
+     }
+    ],
+    "refused_values": [],
+    "normalized_values": [
+     {
+      "property": "list-style-type",
+      "value": "(name)",
+      "count": 11
+     }
+    ],
+    "applied_declarations": 239,
+    "image_errors": []
+   },
+   "source_report": {
+    "stand_ins": [],
+    "images_not_loaded": [],
+    "tree_equals_capture": true,
+    "tree_difference": null
    },
    "geometry": {
     "semantic": {

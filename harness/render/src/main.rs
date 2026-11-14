@@ -6,7 +6,11 @@
 //!
 //! - `semantic`: tags, attributes and text only, as a Markdown component
 //!   could build them today. Div has no user-agent or author stylesheet, so
-//!   this measures what the missing cascade costs.
+//!   this measures what the missing cascade costs. With `--source`, the
+//!   tree comes from the fixture's Markdown instead of the capture:
+//!   `markdown-tree` parses it, `markdown-div` mounts it, and the capture
+//!   supplies only the viewport. `report --source` checks that this tree
+//!   equals the captured one.
 //! - `computed`: the same tree, with each element's Chromium computed style
 //!   copied onto it as typed declarations (`parse_literal` + `set_property`).
 //!   div-gap: G-CASCADE. This is measurement scaffolding, not an app
@@ -16,16 +20,18 @@
 //! Commands:
 //!
 //! ```text
-//! markdown-render render   <tree.json> <out.png> [--mode M] [--viewport WxH] [--scale S]
-//! markdown-render geometry <tree.json>           [--mode M] [--viewport WxH] [--scale S]
-//! markdown-render report   <tree.json>
+//! markdown-render render   <tree.json> <out.png> [--mode M | --source F.md] [--viewport WxH] [--scale S]
+//! markdown-render geometry <tree.json>           [--mode M | --source F.md] [--viewport WxH] [--scale S]
+//! markdown-render report   <tree.json>           [--source F.md]
 //! ```
 
 use div::typed_style::parse_literal;
 use div::{
     Document, Element, EngineOptions, Error, RasterConfiguration, StyleProperty, ViewportMetrics,
 };
+use markdown_tree::Node;
 use serde_json::{json, Map, Value};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
@@ -295,8 +301,178 @@ fn load(path: &str) -> Result<Value, Box<dyn std::error::Error>> {
     Ok(serde_json::from_str(&std::fs::read_to_string(path)?)?)
 }
 
-fn options(args: &[String], tree: &Value) -> Result<(Mode, Surface), Box<dyn std::error::Error>> {
-    let mut mode = Mode::Computed;
+/// Builds the captured tree, or with `--source` the fixture's Markdown.
+/// Returns the elements in the capture's order and the build report.
+fn build_any(
+    document: &Document,
+    tree_path: &Path,
+    tree: &Value,
+    config: &Config,
+) -> Result<(Vec<Element>, Value), Box<dyn std::error::Error>> {
+    let Some(source) = &config.source else {
+        let builder = build(document, tree_path, tree, config.mode)?;
+        let report = builder.report();
+        return Ok((builder.elements, report));
+    };
+    let (elements, mut report, body) = build_from_source(document, source)?;
+    let difference = first_difference(&captured_lines(&tree["body"]), &tree_lines(&body));
+    report["tree_equals_capture"] = json!(difference.is_none());
+    report["tree_difference"] = json!(difference);
+    Ok((elements, report))
+}
+
+/// The `<body>` of the page `reference/build.mjs` writes around
+/// react-markdown's output, as Chromium parses it. The body holds "\n", the
+/// article and "\n\n\n" (the line endings after `</article>`, `</body>` and
+/// `</html>`); the article holds "\n", the Markdown's nodes and "\n".
+fn page_body(markdown: &str) -> Node {
+    let mut article = vec![Node::Text("\n".to_owned())];
+    article.extend(markdown_tree::parse(markdown));
+    article.push(Node::Text("\n".to_owned()));
+    let element = |name: &str, attributes: Vec<(String, String)>, children: Vec<Node>| {
+        Node::Element(markdown_tree::Element {
+            namespace: markdown_tree::Namespace::Html,
+            name: name.to_owned(),
+            attributes,
+            children: merge_text(children),
+        })
+    };
+    element(
+        "body",
+        Vec::new(),
+        vec![
+            Node::Text("\n".to_owned()),
+            element(
+                "article",
+                vec![("class".to_owned(), "markdown-body".to_owned())],
+                article,
+            ),
+            Node::Text("\n\n\n".to_owned()),
+        ],
+    )
+}
+
+fn merge_text(nodes: Vec<Node>) -> Vec<Node> {
+    let mut merged: Vec<Node> = Vec::new();
+    for node in nodes {
+        match (merged.last_mut(), node) {
+            (Some(Node::Text(last)), Node::Text(text)) => last.push_str(&text),
+            (_, node) => merged.push(node),
+        }
+    }
+    merged
+}
+
+/// Semantic mode from source: `markdown-tree` parses the fixture and
+/// `markdown-div` mounts it. Images load from the fixture's directory, as
+/// a page served from there fetches them, with the MIME type a static
+/// server gives the file's extension.
+fn build_from_source(
+    document: &Document,
+    source: &Path,
+) -> Result<(Vec<Element>, Value, Node), Box<dyn std::error::Error>> {
+    let markdown = std::fs::read_to_string(source)?.replace("\r\n", "\n");
+    let body = page_body(&markdown);
+    let Node::Element(body_node) = &body else {
+        unreachable!("page_body returns an element")
+    };
+    let base = source.parent().unwrap_or(Path::new(".")).to_owned();
+    let load = move |src: &str| -> Option<markdown_div::Image> {
+        let mime_type = match Path::new(src).extension()?.to_str()? {
+            "png" => "image/png",
+            "jpg" | "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
+            "svg" => "image/svg+xml",
+            "webp" => "image/webp",
+            _ => return None,
+        };
+        let bytes = std::fs::read(base.join(src)).ok()?;
+        let sha256 = Sha256::digest(&bytes)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect();
+        Some(markdown_div::Image {
+            bytes,
+            mime_type: mime_type.to_owned(),
+            sha256,
+        })
+    };
+    // div-gap: G-ROOT. As in `build`, the page's `<body>` is a `div` inside
+    // Div's root element.
+    let body_element = Element::create(document, "div")?;
+    document.body().append_child(&body_element)?;
+    let mounted = markdown_div::mount(document, &body_element, &body_node.children, Some(&load))?;
+    let mut elements = vec![body_element];
+    elements.extend(mounted.elements);
+    let report = json!({
+        "stand_ins": mounted.report.stand_ins.iter()
+            .map(|(tag, (stand_in, count))| json!({ "tag": tag, "stand_in": stand_in, "count": count }))
+            .collect::<Vec<_>>(),
+        "images_not_loaded": mounted.report.images_not_loaded,
+    });
+    Ok((elements, report, body))
+}
+
+/// A tree as lines: start tags with their attributes, text, end tags.
+fn tree_lines(node: &Node) -> Vec<String> {
+    fn walk(node: &Node, lines: &mut Vec<String>) {
+        match node {
+            Node::Text(text) => lines.push(format!("text {text:?}")),
+            Node::Element(element) => {
+                lines.push(format!("<{} {:?}>", element.name, element.attributes));
+                for child in &element.children {
+                    walk(child, lines);
+                }
+                lines.push(format!("</{}>", element.name));
+            }
+        }
+    }
+    let mut lines = Vec::new();
+    walk(node, &mut lines);
+    lines
+}
+
+/// The captured tree as [`tree_lines`] writes a tree.
+fn captured_lines(node: &Value) -> Vec<String> {
+    fn convert(node: &Value) -> Node {
+        if let Some(text) = node.get("text").and_then(Value::as_str) {
+            return Node::Text(text.to_owned());
+        }
+        Node::Element(markdown_tree::Element {
+            namespace: markdown_tree::Namespace::Html,
+            name: node["tag"].as_str().unwrap_or("").to_owned(),
+            attributes: node["attrs"]
+                .as_object()
+                .into_iter()
+                .flatten()
+                .map(|(name, value)| (name.clone(), value.as_str().unwrap_or("").to_owned()))
+                .collect(),
+            children: node["children"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(convert)
+                .collect(),
+        })
+    }
+    tree_lines(&convert(node))
+}
+
+fn first_difference(capture: &[String], source: &[String]) -> Option<Value> {
+    let line = (0..capture.len().max(source.len())).find(|&i| capture.get(i) != source.get(i))?;
+    Some(json!({ "line": line, "capture": capture.get(line), "source": source.get(line) }))
+}
+
+struct Config {
+    mode: Mode,
+    surface: Surface,
+    /// The fixture's Markdown, for semantic mode from source.
+    source: Option<PathBuf>,
+}
+
+fn options(args: &[String], tree: &Value) -> Result<Config, Box<dyn std::error::Error>> {
+    let mut mode = None;
+    let mut source = None;
     let viewport = &tree["viewport"];
     let mut surface = Surface {
         width: viewport[0].as_f64().unwrap_or(800.0),
@@ -308,12 +484,13 @@ fn options(args: &[String], tree: &Value) -> Result<(Mode, Surface), Box<dyn std
         let value = rest.next().ok_or_else(|| format!("{flag} needs a value"))?;
         match flag.as_str() {
             "--mode" => {
-                mode = match value.as_str() {
+                mode = Some(match value.as_str() {
                     "semantic" => Mode::Semantic,
                     "computed" => Mode::Computed,
                     other => return Err(format!("unknown mode {other}").into()),
-                }
+                })
             }
+            "--source" => source = Some(PathBuf::from(value)),
             "--viewport" => {
                 let (w, h) = value.split_once('x').ok_or("--viewport is WxH")?;
                 surface.width = w.parse()?;
@@ -323,46 +500,67 @@ fn options(args: &[String], tree: &Value) -> Result<(Mode, Surface), Box<dyn std
             other => return Err(format!("unknown option {other}").into()),
         }
     }
-    Ok((mode, surface))
+    // The source gives tags, attributes and text, not computed styles.
+    let mode = match (mode, &source) {
+        (Some(Mode::Computed), Some(_)) => return Err("--source builds semantic mode".into()),
+        (_, Some(_)) => Mode::Semantic,
+        (mode, None) => mode.unwrap_or(Mode::Computed),
+    };
+    Ok(Config {
+        mode,
+        surface,
+        source,
+    })
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let usage = "usage: markdown-render render <tree.json> <out.png> [--mode semantic|computed] \
-                 [--viewport WxH] [--scale S] | geometry <tree.json> [options] | report <tree.json>";
+                 [--source F.md] [--viewport WxH] [--scale S] | geometry <tree.json> [options] \
+                 | report <tree.json> [--source F.md]";
     match args.first().map(String::as_str) {
         Some("render") => {
             let path = args.get(1).ok_or(usage)?;
             let output = args.get(2).ok_or(usage)?;
             let tree = load(path)?;
-            let (mode, surface) = options(&args[3..], &tree)?;
-            let document = document(&surface)?;
-            build(&document, Path::new(path), &tree, mode)?;
+            let config = options(&args[3..], &tree)?;
+            let document = document(&config.surface)?;
+            build_any(&document, Path::new(path), &tree, &config)?;
             document.render_to_png(output)?;
             Ok(())
         }
         Some("geometry") => {
             let path = args.get(1).ok_or(usage)?;
             let tree = load(path)?;
-            let (mode, surface) = options(&args[2..], &tree)?;
-            let document = document(&surface)?;
-            let builder = build(&document, Path::new(path), &tree, mode)?;
+            let config = options(&args[2..], &tree)?;
+            let document = document(&config.surface)?;
+            let (elements, _) = build_any(&document, Path::new(path), &tree, &config)?;
             document.update_all()?;
             let mut boxes = Vec::new();
-            for element in &builder.elements {
+            for element in &elements {
                 let rect = element.bounding_rect()?;
                 boxes.push(json!(rect.map(|r| [r.x, r.y, r.width, r.height])));
             }
-            println!("{}", json!({ "mode": format!("{mode:?}"), "boxes": boxes }));
+            let output = json!({
+                "mode": format!("{:?}", config.mode),
+                "source": config.source.is_some(),
+                "boxes": boxes,
+            });
+            println!("{output}");
             Ok(())
         }
         Some("report") => {
+            // Without a source, the report covers computed mode, which
+            // meets every gap semantic mode meets and more.
             let path = args.get(1).ok_or(usage)?;
             let tree = load(path)?;
-            let (_, surface) = options(&args[2..], &tree)?;
-            let document = document(&surface)?;
-            let builder = build(&document, Path::new(path), &tree, Mode::Computed)?;
-            println!("{}", serde_json::to_string_pretty(&builder.report())?);
+            let mut config = options(&args[2..], &tree)?;
+            if config.source.is_none() {
+                config.mode = Mode::Computed;
+            }
+            let document = document(&config.surface)?;
+            let (_, report) = build_any(&document, Path::new(path), &tree, &config)?;
+            println!("{}", serde_json::to_string_pretty(&report)?);
             Ok(())
         }
         _ => Err(usage.into()),
@@ -422,5 +620,26 @@ mod tests {
         let document = document(&surface).unwrap();
         let builder = build(&document, Path::new("tree.json"), &tree(), Mode::Semantic).unwrap();
         assert_eq!(builder.report()["applied_declarations"], 0);
+    }
+
+    #[test]
+    fn source_mode_mounts_every_fixture_element_and_loads_images() {
+        let surface = Surface {
+            width: 800.0,
+            height: 600.0,
+            scale: 1.0,
+        };
+        let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+        for name in ["image.md", "readme.md"] {
+            let document = document(&surface).unwrap();
+            let (elements, report, body) =
+                build_from_source(&document, &fixtures.join(name)).unwrap();
+            let starts = tree_lines(&body)
+                .iter()
+                .filter(|line| line.starts_with('<') && !line.starts_with("</"))
+                .count();
+            assert_eq!(elements.len(), starts, "{name}");
+            assert_eq!(report["images_not_loaded"], json!([]), "{name}");
+        }
     }
 }

@@ -89,10 +89,12 @@ Commands and file layout are in the [README](../README.md#reproduce-the-comparis
 
    The viewport is 800 px wide and as tall as the page.
 3. **Render.** `markdown-render` (Div public API only, `chromium_linux_lcd`
-   raster, pinned FreeType) rebuilds the tree in two modes:
-   - `semantic`: tags, attributes and text only;
-   - `computed`: also each computed value through `parse_literal` +
-     `set_property`.
+   raster, pinned FreeType) builds the page in two modes:
+   - `semantic`: tags, attributes and text only. Since P2-2 this starts
+     from the fixture's Markdown (`markdown-tree`, mounted by
+     `markdown-div`), and the report checks the tree against the capture;
+   - `computed`: the captured tree, with each computed value through
+     `parse_literal` + `set_property`.
 
    Tags Div rejects get a `span` or `div` stand-in. Every rejection is
    counted in a per-fixture report.
@@ -162,7 +164,7 @@ read from Div's source.
 | MD-12 | all text → line metrics and glyph position | Measured: line box 1/64 px off at 13.6 px (h6, code); h1 (32 px, weight 600) glyphs differ at 1x; text 1 device px lower at 2x in some paragraphs | Match Chromium's LayoutUnit snapping of line height and glyph origins; cause not yet isolated | engine (text) | M |
 | MD-13 | footnotes, clearfix → `::before`/`::after` | Read: `set_pseudo_style` covers first-line, first-letter, marker and placeholder only | Generated content from stylesheets (comes with A1 sheets); a public target for before/after | engine (A1) | S after A1 |
 | MD-14 | details → disclosure marker | Measured: `disclosure-open`/`-closed` rejected by the literal parser, though the enum has them | Parse them; the UA preset gives `summary` its marker | engine | S |
-| MD-15 | images → `<img src>` | Measured: setting `src` loads nothing; the app must register bytes and pass the intrinsic size, otherwise 300×150. Read: static SVG draws only `<rect>` (components track finding) | `src` resolved through the document's resource provider with a base URL; size from the decoded bytes; async remote loading; SVG paths, strokes and text from the inline SVG painter (V1), which the platform decisions of 13 November 2026 schedule right after the engine's Tier 0 | framework + engine (paint, V1) | M (+L for SVG) |
+| MD-15 | images → `<img src>` | Measured: setting `src` loads nothing; the app must register bytes and pass the intrinsic size, otherwise 300×150 (both images of the image fixture, mounted from source). Read: `register_image_resource` and `load_image_resource` take the MIME type and SHA-256 from the caller, and paint decodes by that MIME type and caches by that hash. Read: static SVG draws only `<rect>` (components track finding) | `src` resolved through the document's resource provider with a base URL; type from the response or the bytes, and the cache key computed by the engine; size from the decoded bytes; async remote loading; SVG paths, strokes and text from the inline SVG painter (V1), which the platform decisions of 13 November 2026 schedule right after the engine's Tier 0 | framework + engine (paint, V1) | M (+L for SVG) |
 | MD-16 | all → text selection and copy | Read: `copy_selection` copies only from the focused form control; no document selection | The web-shaped `Range`/`Selection`/`StaticRange` model the editor sample needs (decision of 13 November 2026, Q7), and on top of it Markdown's conveniences: drag, double and triple click, Ctrl+A, `::selection` paint, `user-select`, copy as text | engine (model) + framework (input, copy) | L |
 | MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
 | MD-18 | GitHub raw HTML → presentational attributes | Read: none | `align` on `p`/`div`/`img`/headings, `width`/`height` on `img` (GitHub strips `style`, so no runtime CSS is needed for parity) | engine (UA preset) | S |
@@ -260,7 +262,7 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-0 | Pin Div `main` (92ea25a0), reseed the lock, rerun the yardstick | – | reference pages, both modes |
 | P2-1 | `markdown-tree` crate: Markdown source → the DOM Chromium builds for react-markdown with remark-gfm and rehype-raw (tags, attributes, classes, text, in order). Done: [result](#p2-1-result) | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages` per fixture, and with the CommonMark and GFM corpora |
 | P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown. Done: `parse_with(…, Options { sanitize: true })`, measured in the [P2-1 result](#p2-1-result) | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
-| P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree | – | Yardstick semantic mode, rendered from source |
+| P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree. Done: [result](#p2-2-result) | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
 | P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
@@ -337,6 +339,41 @@ Not ported and not measured:
 
 GitHub's sanitizer strips the first, and the second needs `[a](/u "")`.
 
+### P2-2 result
+
+`crates/markdown-div` mounts `markdown-tree`'s nodes under a Div element
+through divui's public API: `Element::create`, `set_attribute`,
+`append_text_node`, `append_child`, and for images
+`register_image_resource` + `set_image_resource`. It adds no style. Its
+report counts what Div cannot take: stand-in tags (G-TAGS, chosen by
+HTML's phrasing content category) and images the app's loader could not
+supply.
+
+The harness's semantic mode now renders from source:
+`markdown-render --source fixtures/<id>.md` parses the fixture, wraps it in
+the page's `<body>` and `<article>` and mounts it. `report --source`
+compares that tree (elements, attribute names, values and order, text)
+with the DOM captured from Chromium. Measured with `harness/compare.py`
+at `92ea25a0`:
+
+| | Result |
+| --- | --- |
+| Source tree equal to the captured DOM | 24/24 pages |
+| Semantic mode, from source | 0/48 pages exact, 0/392 boxes |
+| Computed mode (unchanged input) | 8/48 pages exact, 214/392 boxes, every pixel count equal to the previous run |
+
+Semantic pixel counts are equal to the captured-tree run on 22 pages. On
+the image pages (light and dark) they differ: from source, each image is
+300×150, because Div takes no intrinsic size from the image data
+(G-IMG-SIZE, MD-15) and `markdown-div` does not decode images in its place.
+The captured tree passed Chromium's decoded size.
+
+Two capture bugs surfaced and were fixed. With them in place, 5 of the 24
+trees did not match:
+- The harness sorted attributes by name. Its JSON now keeps document order.
+- The capture read attributes after its size probe had rewritten `style`
+  (`text-align:left` became `text-align: left;`). It now reads them first.
+
 ### Yardstick history
 
 `harness/compare.py` over all 24 reference pages, Chrome for Testing
@@ -348,6 +385,7 @@ added the row.
 | --- | --- | --- | --- | --- |
 | `565db46a` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | phase 1 baseline |
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | none: every measured value equal (the two new commits are framework-only `{expr}` view children) |
+| `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | P2-2: semantic mode from Markdown source (24/24 trees equal the capture). Pixels changed only on the two image pages (300×150 images, G-IMG-SIZE) |
 
 ## CSS inventory
 

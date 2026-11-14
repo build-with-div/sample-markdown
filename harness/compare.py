@@ -12,10 +12,12 @@ HTML with github-markdown-css):
    is the page's scroll height, so the whole document is compared.
 2. Chromium rasterizes the page at each profile, in the same session
    (two identical frames, as Div's census capture requires).
-3. `markdown-render` rebuilds the tree with Div's public API twice:
-   `semantic` (tags, attributes and text only, which is all Div can take
-   today without a cascade) and `computed` (each element also gets
-   Chromium's computed style as typed declarations, which removes the
+3. `markdown-render` builds the page with Div's public API twice:
+   `semantic` from the fixture's Markdown (`markdown-tree` parses it and
+   `markdown-div` mounts tags, attributes and text, which is all Div can
+   take today without a cascade; the report checks that this tree equals
+   the captured one) and `computed` from the capture (each element also
+   gets Chromium's computed style as typed declarations, which removes the
    cascade from the comparison).
 4. Pixels are compared exactly: the whole page, and the box of each
    top-level block of the article. Element boxes are compared within
@@ -70,6 +72,9 @@ new Promise(resolve => {
     const body = document.body;
     const all = [body, ...body.querySelectorAll('*')];
     const styles = all.map(element => getComputedStyle(element));
+    // Attributes as parsed, before the size probe below rewrites `style`.
+    const attributes = all.map(element =>
+      Array.from(element.attributes, attribute => [attribute.name, attribute.value]));
     // Authored sizes: getComputedStyle reports the used width and height of
     // a rendered box, but the computed value (auto, 4px, max-content, 100%)
     // of a box with display: none. Read them that way, one element at a time.
@@ -126,7 +131,7 @@ new Promise(resolve => {
       }
       const node = {tag: element.localName, attrs: {}, style, rect: record.rect,
                     children: []};
-      for (const attribute of element.attributes) node.attrs[attribute.name] = attribute.value;
+      for (const [name, value] of attributes[index - 1]) node.attrs[name] = value;
       if (Object.keys(record.pseudo).length) node.pseudo = record.pseudo;
       if (element.localName === 'img') node.image = {src: element.getAttribute('src'),
                                                      url: element.currentSrc,
@@ -326,12 +331,17 @@ def compare_fixture(fixture: dict, chrome: Path, renderer: Path, results: Path) 
 
     row: dict = {"fixture": fixture["id"], "viewport": [WIDTH, height], "profiles": {},
                  "pseudo_elements": pseudo}
-    report = run_renderer(renderer, "report", str(tree_path))
-    if report.returncode == 0:
-        row["build_report"] = json.loads(report.stdout)
-        (directory / "report.json").write_text(report.stdout)
-    else:
-        row["build_report"] = {"error": report.stderr.strip()}
+    source = str(ROOT / fixture["source"])
+    mode_args = {"semantic": ["--mode", "semantic", "--source", source],
+                 "computed": ["--mode", "computed"]}
+    for key, args, name in (("build_report", [], "report.json"),
+                            ("source_report", ["--source", source], "source-report.json")):
+        report = run_renderer(renderer, "report", str(tree_path), *args)
+        if report.returncode == 0:
+            row[key] = json.loads(report.stdout)
+            (directory / name).write_text(report.stdout)
+        else:
+            row[key] = {"error": report.stderr.strip()}
 
     # Top-level blocks of the article, by element index in the tree.
     nodes = elements(tree["body"])
@@ -346,7 +356,7 @@ def compare_fixture(fixture: dict, chrome: Path, renderer: Path, results: Path) 
         for mode in MODES:
             div_png = directory / f"div-{mode}@{scale:g}x.png"
             done = run_renderer(renderer, "render", str(tree_path), str(div_png),
-                                "--mode", mode, "--scale", f"{scale:g}")
+                                *mode_args[mode], "--scale", f"{scale:g}")
             if done.returncode != 0:
                 prow[mode] = {"status": "error", "error": done.stderr.strip()[-2000:]}
                 continue
@@ -370,11 +380,15 @@ def compare_fixture(fixture: dict, chrome: Path, renderer: Path, results: Path) 
     # Geometry at 1x for both modes.
     row["geometry"] = {}
     for mode in MODES:
-        done = run_renderer(renderer, "geometry", str(tree_path), "--mode", mode)
+        done = run_renderer(renderer, "geometry", str(tree_path), *mode_args[mode])
         if done.returncode != 0:
             row["geometry"][mode] = {"error": done.stderr.strip()[-2000:]}
             continue
         div_boxes = json.loads(done.stdout)["boxes"]
+        if len(div_boxes) != len(nodes):
+            row["geometry"][mode] = {"error": f"{len(div_boxes)} Div elements for "
+                                              f"{len(nodes)} captured ones"}
+            continue
         per_tag: dict = {}
         differences = []
         for index, (node, expected, actual) in enumerate(zip(nodes, chromium_boxes, div_boxes)):
@@ -437,8 +451,10 @@ def main(argv: list[str] | None = None) -> int:
                 r = prow.get(mode, {})
                 cells.append(f"{mode[:4]}@{profile.split('@')[1]}={r.get('status')}"
                              f"({r.get('mismatched_pixels', '-')})")
-        geometry = row["geometry"].get("computed", {})
-        print(f"{row['fixture']:22} {' '.join(cells)} boxes={geometry.get('exact')}/{geometry.get('total')}")
+        boxes = " ".join(f"{mode[:4]}-boxes={g.get('exact')}/{g.get('total')}"
+                         for mode, g in row["geometry"].items())
+        tree = row["source_report"].get("tree_equals_capture")
+        print(f"{row['fixture']:22} {' '.join(cells)} {boxes} source-tree-equal={tree}")
     print(f"wrote {output}")
     return 0
 

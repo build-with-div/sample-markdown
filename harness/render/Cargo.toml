@@ -13,4 +13,8 @@ path = "src/main.rs"
 
 [dependencies]
 divui.workspace = true
-serde_json.workspace = true
+# Attributes keep their document order from the capture.
+serde_json = { workspace = true, features = ["preserve_order"] }
+markdown-tree = { path = "../../crates/markdown-tree" }
+markdown-div = { path = "../../crates/markdown-div" }
+sha2.workspace = true
