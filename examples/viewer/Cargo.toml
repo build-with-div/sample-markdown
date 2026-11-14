@@ -1,0 +1,20 @@
+[package]
+name = "markdown-viewer"
+description = "A Markdown viewer on Div: open a file, scroll it, switch the theme"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = []
+# A native window with an Open dialog. Without them, the viewer renders the
+# file to a PNG headlessly.
+linux = ["divui/linux", "divui/dialog"]
+windows = ["divui/windows", "divui/dialog"]
+
+[dependencies]
+divui.workspace = true
+markdown-tree = { path = "../../crates/markdown-tree" }
+markdown-div = { path = "../../crates/markdown-div" }

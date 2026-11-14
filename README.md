@@ -12,8 +12,10 @@ and CSS the way Chromium does, so a Markdown view is a port of those
 packages rather than a re-creation of their look.
 
 Status: phase 2. `crates/markdown-tree` ports react-markdown with
-remark-gfm, rehype-raw and, as an option, rehype-sanitize to Rust. No
-viewer app yet. See
+remark-gfm, rehype-raw and, as an option, rehype-sanitize to Rust;
+`crates/markdown-div` mounts the result in Div, and `examples/viewer` is
+a viewer app built on them (screenshots in
+[docs/design.md](docs/design.md#p2-3-result)). See
 [docs/design.md](docs/design.md) for the findings and plan, and
 [docs/rfc-markdown.md](docs/rfc-markdown.md) for the Div APIs it proposes.
 
@@ -27,9 +29,17 @@ viewer app yet. See
 | `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize |
 | `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/` |
 | `crates/markdown-div` | Mounts that tree in a Div document through the public API, with a report of what Div cannot take |
+| `examples/viewer` | `markdown-viewer`: open a `.md` file, scroll it, switch the theme. What Div cannot do yet is labeled `div-gap` |
 | `harness/render` | `markdown-render`: builds a page with Div's public API, from a fixture's Markdown or a captured tree, and renders it |
 | `harness/compare.py` | Captures each page in pinned Chromium, renders it with Div, compares pixels and element boxes |
 | `harness/css_inventory.py` | Lists the selectors, at-rules, properties and functions a stylesheet uses |
+
+## Run the viewer
+
+```sh
+cargo run -p markdown-viewer --features windows -- fixtures/readme.md   # or --features linux
+cargo run -p markdown-viewer -- --png viewer.png fixtures/readme.md     # headless, to a PNG
+```
 
 ## Reproduce the comparison
 

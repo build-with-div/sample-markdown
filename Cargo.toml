@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/markdown-tree", "crates/markdown-div", "harness/render"]
+members = ["crates/markdown-tree", "crates/markdown-div", "examples/viewer", "harness/render"]
 
 [workspace.package]
 edition = "2021"

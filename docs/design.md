@@ -155,7 +155,7 @@ read from Div's source.
 | MD-3 | react-markdown → UA stylesheet | Measured: semantic mode 0/392 boxes. Read: RFC 0004 proposed, not started | The browser preset's text, sections, lists and tables parts first: these are what Markdown uses | engine | L |
 | MD-4 | github-markdown-css → selectors and cascade | Read: A1 in progress (`style!` done; `css!`, `stylesheet!` next). RFC 0001 makes unsupported selectors compile errors | `stylesheet!` over the npm file. Descendant, child and sibling combinators; attribute selectors; `:hover`, `:focus-visible`, `:not`, `:has`, `:first/last/nth-child`, `:target`, `:dir`. A browser-compatible ingestion mode for third-party sheets that drops what Chromium drops (10 vendor pseudo-elements, `-ms-`/`-webkit-` properties) and reports it ([RFC](rfc-markdown.md#3-third-party-stylesheets)). Adopted in the platform decisions of 13 November 2026 (Q3, option B); compile-time strictness stays for Div-authored code | engine (A1, ingestion) | L |
 | MD-5 | github-markdown-css → custom properties | Read: none (A2 tokens planned) | 60 tokens, 124 `var()` uses, swapped by `[data-theme]` or the color scheme | engine (A2) | M |
-| MD-6 | github-markdown-css → media | Read: none (A2) | `prefers-color-scheme`, `max-width: 767px`; the framework follows the OS theme (`Document::set_color_scheme` in RFC 0001) | engine (A2) + framework | M |
+| MD-6 | github-markdown-css → media | Read: none (A2). Measured in the viewer: a theme switch can set only the article's `data-theme`, which nothing reads, and the app cannot learn the system theme | `prefers-color-scheme`, `max-width: 767px`; the framework follows the OS theme (`Document::set_color_scheme` in RFC 0001) | engine (A2) + framework | M |
 | MD-7 | lists → markers and counters | Measured: `list-style-type` takes `none` and `disc` only; `counter-increment: list-item 0` and `list-style-position: inside` rejected | `decimal`, `lower-roman`, `circle`, `square` (and the rest of CSS Counter Styles' predefined set Chromium has), `ol start`/`reversed`/`li value`, the `list-item` counter, `inside` markers | engine | M |
 | MD-8 | GFM tables → table layout | Measured: `table` with `display: block` (github-markdown-css) has row groups that do not share columns; `width: max-content` rejected; collapsed borders differ | Anonymous table wrapping as in CSS 2 §17.2.1 and Chromium; `max-content`/`min-content`/`fit-content` sizes; `border-collapse` painting | engine | L |
 | MD-9 | `del`, links → text decoration | Measured: `text-decoration-line: line-through` or `underline` through `set_property` paints no line on an inline span or a block (`out/probe` td-*) | Painting of text decoration lines | engine | S–M |
@@ -166,11 +166,12 @@ read from Div's source.
 | MD-14 | details → disclosure marker | Measured: `disclosure-open`/`-closed` rejected by the literal parser, though the enum has them | Parse them; the UA preset gives `summary` its marker | engine | S |
 | MD-15 | images → `<img src>` | Measured: setting `src` loads nothing; the app must register bytes and pass the intrinsic size, otherwise 300×150 (both images of the image fixture, mounted from source). Read: `register_image_resource` and `load_image_resource` take the MIME type and SHA-256 from the caller, and paint decodes by that MIME type and caches by that hash. Read: static SVG draws only `<rect>` (components track finding) | `src` resolved through the document's resource provider with a base URL; type from the response or the bytes, and the cache key computed by the engine; size from the decoded bytes; async remote loading; SVG paths, strokes and text from the inline SVG painter (V1), which the platform decisions of 13 November 2026 schedule right after the engine's Tier 0 | framework + engine (paint, V1) | M (+L for SVG) |
 | MD-16 | all → text selection and copy | Read: `copy_selection` copies only from the focused form control; no document selection | The web-shaped `Range`/`Selection`/`StaticRange` model the editor sample needs (decision of 13 November 2026, Q7), and on top of it Markdown's conveniences: drag, double and triple click, Ctrl+A, `::selection` paint, `user-select`, copy as text | engine (model) + framework (input, copy) | L |
-| MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
+| MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally. Measured in the viewer: a click on `<a href="#user-content-fn-1">` leaves the document at scroll position 0 with the footnote 1,188 px down | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
 | MD-18 | GitHub raw HTML → presentational attributes | Read: none | `align` on `p`/`div`/`img`/headings, `width`/`height` on `img` (GitHub strips `style`, so no runtime CSS is needed for parity) | engine (UA preset) | S |
 | MD-19 | the component | – | A `div-markdown` crate: comrak → real elements → `github-markdown-css` compiled by `stylesheet!` ([API](#recommended-component-api)) | components | M (after MD-1, 3, 4) |
 | MD-20 | Shiki → highlighting | Read: colored spans work today (inline `color`) | Nothing in Div for single themes. Shiki's dual themes need MD-5 and MD-6 | components (syntect) | S |
 | MD-21 | KaTeX (stretch) | Read: `register_font_face` exists; WOFF2 fails on Linux with the census FreeType (components track); SVG `path` fill not drawn | `@font-face` in sheets, WOFF2 decode on Linux, SVG paths (V1), exact inline-block baselines | engine | L |
+| MD-23 | all → keyboard scrolling | Measured in the viewer (headless dispatch, `Document::dispatch_key`): PageDown, ArrowDown, Space and End leave a scroll container at 0, after a click in it and when it has focus. Without `tabindex`, `focus()` on it fails (`NotFocusable`). Read: no key in div-engine or divui has a scrolling default action. The wheel scrolls it (120 px per notch) | Keyboard scrolling of the focused or last-clicked scroller, and of the viewport: arrows, Page Up/Down, Space/Shift+Space, Home/End, as Chromium does. Scrollers without focusable content are keyboard-focusable, as in Chromium since 130 | engine (default actions) + framework (key routing) | M |
 | MD-22 | Mermaid (stretch) | Div has no JavaScript by design | A Rust port of the layout (dagre) plus SVG text, strokes and markers (V1 stages); or pre-rendered SVG. Defer | components + engine | L |
 
 ## Recommended component API
@@ -263,7 +264,7 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-1 | `markdown-tree` crate: Markdown source → the DOM Chromium builds for react-markdown with remark-gfm and rehype-raw (tags, attributes, classes, text, in order). Done: [result](#p2-1-result) | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages` per fixture, and with the CommonMark and GFM corpora |
 | P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown. Done: `parse_with(…, Options { sanitize: true })`, measured in the [P2-1 result](#p2-1-result) | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree. Done: [result](#p2-2-result) | – | Yardstick semantic mode, rendered from source |
-| P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
+| P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17). Done: [result](#p2-3-result) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
 | P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
 | P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
@@ -373,6 +374,46 @@ trees did not match:
 - The harness sorted attributes by name. Its JSON now keeps document order.
 - The capture read attributes after its size probe had rewritten `style`
   (`text-align:left` became `text-align: left;`). It now reads them first.
+
+### P2-3 result
+
+`examples/viewer` (`markdown-viewer`) is a Div app:
+- a toolbar with Open (a native file dialog), a theme switch, the file name
+  and a status line;
+- the document in a scroll container below it, parsed by `markdown-tree`
+  and mounted by `markdown-div`.
+
+The toolbar and the article's page layout (the 980 px column and 45 px
+padding that `reference/build.mjs` uses) are the viewer's own style. The
+document gets no other style, because github-markdown-css cannot load into
+Div yet (MD-3, MD-4, MD-5). It shows Div's defaults for HTML elements, as
+semantic mode does. The status line lists the stand-in tags.
+
+Interaction traces run headless at 900×700 through Div's input dispatch
+(`cargo test -p markdown-viewer`, 7 tests):
+
+| Interaction | Result |
+| --- | --- |
+| Open a file, then another | The document is replaced; the title and status follow |
+| Wheel, 120 px down, over the document | Scrolls 120 px |
+| Click the theme button | Theme dark, `data-theme="dark"`, button reads "Light" |
+| PageDown, ArrowDown, Space, End after a click in the document, then with the scroller focused | No scroll (MD-23, new) |
+| Click a footnote reference | No navigation (MD-17) |
+| Images of the image fixture | Loaded through `markdown-div`'s directory loader; each box is 300×150 (MD-15) |
+
+The `div_gap_*` tests pin those gaps and fail when Div closes them. The
+viewer does not script keys, links or the theme in Div's place.
+
+Screenshots (headless, Linux):
+- [readme, light](screenshots/viewer-readme-light.png)
+- [readme, dark](screenshots/viewer-readme-dark.png): only the toolbar
+  changes
+- [image fixture](screenshots/viewer-image-light.png): 300×150 images, and
+  the SVG draws only its `<rect>`
+
+The windowed build (`--features windows`) was built and its first frame
+rendered through `DIV_RENDER_PNG` on Windows. The dialog and window were
+not driven, since no automation of a native window was available here.
 
 ### Yardstick history
 
