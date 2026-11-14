@@ -271,7 +271,7 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17). Done: [result](#p2-3-result) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: Shiki's tokenizer (`@shikijs/vscode-textmate`) ported to Rust on Oniguruma, with Shiki's grammars and themes, producing Shiki's tokens. Planned on syntect; changed, for the reasons in the result. Done: [result](#p2-4-result) | Shiki | Token and color equality with Shiki's output |
 | P2-4b | Highlighted code blocks: Shiki's spans in the reference pages, and the port's spans mounted in Div. Done: [result](#p2-4b-result) | Shiki (`@shikijs/rehype`) | Pixels of colored code blocks in computed mode |
-| P2-4c | The viewer highlights code blocks, with the Shiki theme following its theme switch | Shiki | Viewer tests |
+| P2-4c | The viewer highlights code blocks, with the Shiki theme following its theme switch. Done: [result](#p2-4c-result) | Shiki (`@shikijs/rehype`) | Viewer tests |
 | P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
 | P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
 
@@ -541,6 +541,29 @@ row at 1x:
 
 Gaps: MD-24 is new (engine, S/M). MD-20 now needs only MD-24 for single
 themes. Not done here: the viewer (P2-4c).
+
+### P2-4c result
+
+`markdown-viewer` highlights code blocks as the reference pages do:
+`@shikijs/rehype` through `markdown-highlight`, with github-light or
+github-dark for the viewer's theme. A theme switch renders the open
+document again with the other Shiki theme, as an app with one Shiki theme
+renders again, and keeps the scroll position. The viewer keeps the
+document's Markdown, so a switch does not read the file again.
+
+Measured by the viewer's headless tests (`cargo test -p markdown-viewer`,
+Windows, 900×700):
+
+| Test | Result |
+| --- | --- |
+| `code_blocks_are_highlighted_with_the_theme` | `code.md`: one `shiki github-light` block (its `rust` block; the blocks without a language stay as they are), `shiki github-dark` after a click on the theme button; the article's text equals the pipeline's |
+| `switching_the_theme_keeps_the_scroll_position` | Scrolled 240 px by the wheel, then switched: still at 240 px, with the block in github-dark |
+| `div_gap_md24_highlighted_code_shows_no_color` | The `let` span, `style="color:#D73A49"`, has the article's computed color (MD-24). Fails when Div applies inline styles |
+
+The yardstick does not cover the viewer and was not rerun: the pages, the
+harness and the pin did not change. Gaps: none new. MD-24 is why the
+viewer's code shows no color; it is with the engine track, and the viewer
+does not work around it.
 
 ### Yardstick history
 

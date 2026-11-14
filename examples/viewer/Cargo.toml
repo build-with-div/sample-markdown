@@ -17,4 +17,5 @@ windows = ["divui/windows", "divui/dialog"]
 [dependencies]
 divui.workspace = true
 markdown-tree = { path = "../../crates/markdown-tree" }
+markdown-highlight = { path = "../../crates/markdown-highlight" }
 markdown-div = { path = "../../crates/markdown-div" }

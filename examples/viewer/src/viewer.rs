@@ -2,7 +2,9 @@
 //! container below it.
 //!
 //! The toolbar is the viewer's own UI and carries its own style. The
-//! document is the Markdown as `markdown-tree` parses it, mounted by
+//! document is the Markdown as `markdown-tree` parses it, its code blocks
+//! highlighted by `markdown-highlight` (`@shikijs/rehype` with the Shiki
+//! theme of the viewer's theme, as on the reference pages), mounted by
 //! `markdown-div` with no style: github-markdown-css cannot load into Div
 //! yet (MD-3, MD-4, MD-5), so the document shows Div's defaults for HTML
 //! elements. Where the web platform would do more, the code says
@@ -15,6 +17,8 @@ use std::rc::Rc;
 
 use div::typed_style::parse_literal;
 use div::{Document, Element, StyleProperty};
+use markdown_highlight::{Highlighter, RehypeShiki};
+use markdown_tree::Options;
 
 /// The viewer's color theme.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -37,6 +41,21 @@ impl Theme {
             Self::Dark => Self::Light,
         }
     }
+
+    /// The Shiki theme for code blocks, as `reference/build.mjs` pairs
+    /// them with the pages' themes.
+    pub fn shiki_theme(self) -> &'static str {
+        match self {
+            Self::Light => "github-light",
+            Self::Dark => "github-dark",
+        }
+    }
+}
+
+/// The open document: where it came from and its Markdown.
+struct Source {
+    path: PathBuf,
+    markdown: String,
 }
 
 pub struct Viewer {
@@ -52,7 +71,8 @@ pub struct Viewer {
     /// `<article class="markdown-body">`, as on the reference pages.
     pub article: Element,
     theme: Cell<Theme>,
-    path: RefCell<Option<PathBuf>>,
+    source: RefCell<Option<Source>>,
+    highlighter: Highlighter,
 }
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -154,7 +174,8 @@ impl Viewer {
             scroller,
             article,
             theme: Cell::new(Theme::Light),
-            path: RefCell::new(None),
+            source: RefCell::new(None),
+            highlighter: Highlighter::bundled(),
         });
         viewer.set_theme(Theme::Light)?;
         let weak = Rc::downgrade(&viewer);
@@ -175,7 +196,10 @@ impl Viewer {
 
     #[cfg_attr(not(any(feature = "linux", feature = "windows")), allow(dead_code))]
     pub fn path(&self) -> Option<PathBuf> {
-        self.path.borrow().clone()
+        self.source
+            .borrow()
+            .as_ref()
+            .map(|source| source.path.clone())
     }
 
     /// Switches the theme.
@@ -186,8 +210,12 @@ impl Viewer {
     /// properties (MD-4, MD-5). The viewer also cannot start in the
     /// system's theme. div-gap: MD-6 `prefers-color-scheme` and the
     /// document's color scheme.
+    ///
+    /// The open document renders again with the theme's Shiki theme, as an
+    /// app with one Shiki theme renders again, and keeps its scroll
+    /// position.
     pub fn set_theme(&self, theme: Theme) -> Result<()> {
-        self.theme.set(theme);
+        let changed = self.theme.replace(theme) != theme;
         self.article.set_attribute("data-theme", theme.name())?;
         let (background, color, button_background) = match theme {
             Theme::Light => ("#f6f8fa", "#1f2328", "#e6eaef"),
@@ -205,6 +233,11 @@ impl Viewer {
         }
         self.theme_button
             .set_text(theme.other().name_capitalized())?;
+        if changed && self.source.borrow().is_some() {
+            let (x, y) = (self.scroller.scroll_left()?, self.scroller.scroll_top()?);
+            self.render()?;
+            self.scroller.scroll_to(x, y)?;
+        }
         Ok(())
     }
 
@@ -212,19 +245,46 @@ impl Viewer {
     /// directory.
     pub fn open(&self, path: &Path) -> Result<()> {
         let markdown = std::fs::read_to_string(path)?.replace("\r\n", "\n");
-        let nodes = markdown_tree::parse(&markdown);
-        let loader =
-            markdown_div::directory_loader(path.parent().unwrap_or(Path::new(".")).to_owned());
-        self.article.remove_all_children()?;
-        let mounted = markdown_div::mount(&self.document, &self.article, &nodes, Some(&loader))?;
-        *self.path.borrow_mut() = Some(path.to_owned());
+        *self.source.borrow_mut() = Some(Source {
+            path: path.to_owned(),
+            markdown,
+        });
+        self.render()?;
         let name = path
             .file_name()
             .map(|name| name.to_string_lossy().into_owned())
             .unwrap_or_default();
         self.title.set_text(&name)?;
-        self.show_status(&summary(mounted.elements.len(), &mounted.report));
         self.scroller.scroll_to(0.0, 0.0)?;
+        Ok(())
+    }
+
+    /// Mounts the open document in place of the article's content, its
+    /// code highlighted with the theme's Shiki theme.
+    ///
+    /// div-gap: MD-24 the `style` attribute. Shiki's token colors and its
+    /// block colors are in `style` attributes, which Div keeps but does not
+    /// apply, so the highlighted code shows the article's color.
+    fn render(&self) -> Result<()> {
+        let source = self.source.borrow();
+        let Some(source) = source.as_ref() else {
+            return Ok(());
+        };
+        let highlight = RehypeShiki {
+            highlighter: &self.highlighter,
+            theme: self.theme().shiki_theme(),
+        };
+        let options = Options {
+            highlight: Some(&highlight),
+            ..Options::default()
+        };
+        let nodes = markdown_tree::parse_with(&source.markdown, options);
+        let loader = markdown_div::directory_loader(
+            source.path.parent().unwrap_or(Path::new(".")).to_owned(),
+        );
+        self.article.remove_all_children()?;
+        let mounted = markdown_div::mount(&self.document, &self.article, &nodes, Some(&loader))?;
+        self.show_status(&summary(mounted.elements.len(), &mounted.report));
         Ok(())
     }
 
