@@ -152,8 +152,14 @@ def main() -> int:
         f"- Chromium {results['chromium']} (Chrome for Testing, Linux, census real-font fontconfig).",
         f"- Div {results['div_commit']}, `markdown-render`, raster configuration `chromium_linux_lcd`, pinned FreeType.",
         "- Reference: " + ", ".join(f"{k} {v}" for k, v in results["reference_versions"].items()) + ".",
-        "- Semantic: tags, attributes and text through `Element::create` only. "
-        "Computed: plus each element's Chromium computed style as typed declarations.",
+        "- Semantic: the fixture's Markdown, parsed by `markdown-tree` and mounted by "
+        "`markdown-div` (tags, attributes and text only; images without an intrinsic size). "
+        "Computed: the captured tree, plus each element's Chromium computed style as typed "
+        "declarations.",
+        "- Source tree equal to the captured DOM: "
+        + pct(sum(1 for row in results["fixtures"]
+                  if row.get("source_report", {}).get("tree_equals_capture")),
+              len(results["fixtures"])) + " pages.",
         "- Pixels compared exactly (any channel difference counts). "
         "Boxes: `getBoundingClientRect` against `Element::bounding_rect`, tolerance 1/128 px.",
         "",

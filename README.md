@@ -26,7 +26,8 @@ viewer app yet. See
 | `reference/` | `build.mjs` turns each fixture into a Chromium reference page (react-markdown, remark-gfm, rehype-raw, github-markdown-css), light and dark; the pages are committed |
 | `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize |
 | `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/` |
-| `harness/render` | `markdown-render`: rebuilds a captured page tree with Div's public API and renders it |
+| `crates/markdown-div` | Mounts that tree in a Div document through the public API, with a report of what Div cannot take |
+| `harness/render` | `markdown-render`: builds a page with Div's public API, from a fixture's Markdown or a captured tree, and renders it |
 | `harness/compare.py` | Captures each page in pinned Chromium, renders it with Div, compares pixels and element boxes |
 | `harness/css_inventory.py` | Lists the selectors, at-rules, properties and functions a stylesheet uses |
 
