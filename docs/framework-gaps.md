@@ -38,3 +38,7 @@ Checked against Div `565db46a`; the gaps are unchanged at `92ea25a0` (same measu
   footnote; links do nothing (`div_gap_md17_fragment_links_do_not_navigate`).
 - **MD-23 Keyboard scrolling.** No key scrolls the viewer's document,
   focused or not (`div_gap_md23_keys_do_not_scroll`).
+- **MD-24 Inline `style` attribute.** Div keeps a `style` attribute but
+  does not apply its declarations, so Shiki's highlighted code shows the
+  inherited color in semantic mode
+  (`div_gap_md24_style_attribute_is_not_applied` in `crates/markdown-div`).

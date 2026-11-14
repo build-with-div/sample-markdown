@@ -5,7 +5,8 @@
   "@shikijs/langs": "4.6.0",
   "@shikijs/themes": "4.6.0",
   "@shikijs/vscode-textmate": "10.1.0",
-  "@shikijs/engine-oniguruma": "4.6.0"
+  "@shikijs/engine-oniguruma": "4.6.0",
+  "@shikijs/rehype": "4.6.0"
  },
  "themes": {
   "github-light": {

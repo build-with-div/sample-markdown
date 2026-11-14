@@ -331,11 +331,13 @@ def compare_fixture(fixture: dict, chrome: Path, renderer: Path, results: Path) 
 
     row: dict = {"fixture": fixture["id"], "viewport": [WIDTH, height], "profiles": {},
                  "pseudo_elements": pseudo}
-    source = str(ROOT / fixture["source"])
-    mode_args = {"semantic": ["--mode", "semantic", "--source", source],
+    source = ["--source", str(ROOT / fixture["source"])]
+    if fixture.get("highlight"):
+        source += ["--highlight", fixture["highlight"]]
+    mode_args = {"semantic": ["--mode", "semantic", *source],
                  "computed": ["--mode", "computed"]}
     for key, args, name in (("build_report", [], "report.json"),
-                            ("source_report", ["--source", source], "source-report.json")):
+                            ("source_report", source, "source-report.json")):
         report = run_renderer(renderer, "report", str(tree_path), *args)
         if report.returncode == 0:
             row[key] = json.loads(report.stdout)

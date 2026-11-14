@@ -152,7 +152,8 @@ def main() -> int:
         f"- Chromium {results['chromium']} (Chrome for Testing, Linux, census real-font fontconfig).",
         f"- Div {results['div_commit']}, `markdown-render`, raster configuration `chromium_linux_lcd`, pinned FreeType.",
         "- Reference: " + ", ".join(f"{k} {v}" for k, v in results["reference_versions"].items()) + ".",
-        "- Semantic: the fixture's Markdown, parsed by `markdown-tree` and mounted by "
+        "- Semantic: the fixture's Markdown, parsed by `markdown-tree`, its code blocks "
+        "highlighted by `markdown-highlight` with the page's Shiki theme, and mounted by "
         "`markdown-div` (tags, attributes and text only; images without an intrinsic size). "
         "Computed: the captured tree, plus each element's Chromium computed style as typed "
         "declarations.",

@@ -16,8 +16,10 @@ remark-gfm, rehype-raw and, as an option, rehype-sanitize to Rust;
 `crates/markdown-div` mounts the result in Div, and `examples/viewer` is
 a viewer app built on them (screenshots in
 [docs/design.md](docs/design.md#p2-3-result)). `crates/markdown-highlight`
-ports Shiki's code highlighting; its tokens and colors equal Shiki's
-([result](docs/design.md#p2-4-result)). See
+ports Shiki's code highlighting and `@shikijs/rehype`; its tokens equal
+Shiki's, and its highlighted blocks equal the reference pages'
+([P2-4](docs/design.md#p2-4-result), [P2-4b](docs/design.md#p2-4b-result)).
+Div does not apply their colors yet (MD-24). See
 [docs/design.md](docs/design.md) for the findings and plan, and
 [docs/rfc-markdown.md](docs/rfc-markdown.md) for the Div APIs it proposes.
 
@@ -28,10 +30,10 @@ ports Shiki's code highlighting; its tokens and colors equal Shiki's
 | `fixtures/*.md` | Small GFM documents, one feature each, plus a README-like page |
 | `fixtures/gfm-cases.json` | Short GFM and raw-HTML cases for the tree test |
 | `fixtures/shiki-cases.json` | Code in 11 languages for the highlighting test |
-| `reference/` | `build.mjs` turns each fixture into a Chromium reference page (react-markdown, remark-gfm, rehype-raw, github-markdown-css), light and dark; the pages are committed |
-| `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize; `shiki.json`, Shiki's tokens for the highlighting cases |
-| `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/` |
-| `crates/markdown-highlight` | A port of Shiki's highlighting (vscode-textmate on Oniguruma) with Shiki's grammars and themes in `data/`, checked against `reference/corpus/shiki.json` |
+| `reference/` | `build.mjs` turns each fixture into a Chromium reference page (react-markdown, remark-gfm, rehype-raw, `@shikijs/rehype`, github-markdown-css), light and dark; the pages are committed |
+| `reference/corpus/` | The fixtures, the CommonMark spec's examples and the GFM cases rendered by the same packages, without and with rehype-sanitize; `shiki.json`, Shiki's tokens for the highlighting cases; `rehype-shiki.json`, all of these with `@shikijs/rehype` |
+| `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/corpus/` |
+| `crates/markdown-highlight` | A port of Shiki's highlighting (vscode-textmate on Oniguruma) with Shiki's grammars and themes in `data/`, and `codeToHast` for `markdown-tree`; checked against `reference/corpus/shiki.json`, `rehype-shiki.json` and the reference pages |
 | `crates/markdown-div` | Mounts that tree in a Div document through the public API, with a report of what Div cannot take |
 | `examples/viewer` | `markdown-viewer`: open a `.md` file, scroll it, switch the theme. What Div cannot do yet is labeled `div-gap` |
 | `harness/render` | `markdown-render`: builds a page with Div's public API, from a fixture's Markdown or a captured tree, and renders it |

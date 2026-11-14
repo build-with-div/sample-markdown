@@ -1,19 +1,20 @@
 //! The port against the npm packages' own output.
 //!
-//! - Every fixture's tree equals the DOM of its reference page.
-//! - Over each corpus (the fixtures, the CommonMark spec's examples and the
-//!   GFM cases in `fixtures/gfm-cases.json`), without and with
-//!   rehype-sanitize, exactly the examples listed in
-//!   `<corpus>[-sanitized]-known-differences.txt` differ. A fix must remove
-//!   its number from the list, and a regression fails.
+//! Over each corpus (the fixtures, the CommonMark spec's examples and the
+//! GFM cases in `fixtures/gfm-cases.json`), without and with
+//! rehype-sanitize, exactly the examples listed in
+//! `<corpus>[-sanitized]-known-differences.txt` differ. A fix must remove
+//! its number from the list, and a regression fails.
 //!
-//! Both inputs are built by `reference/build.mjs` from the pinned packages.
+//! The corpora are built by `reference/build.mjs` from the pinned packages.
+//! The reference pages highlight code with `@shikijs/rehype`, so the test
+//! of the pages is in `markdown-highlight` (`tests/rehype.rs`).
 
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use markdown_tree::{parse, parse_html, parse_with, to_html, Node, Options};
+use markdown_tree::{parse_html, parse_with, to_html, Node, Options};
 
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -23,17 +24,6 @@ fn read(path: &Path) -> String {
     fs::read_to_string(path)
         .unwrap_or_else(|e| panic!("{}: {e}", path.display()))
         .replace("\r\n", "\n")
-}
-
-/// The content of the page's `<article>`, without the template's line
-/// endings around it.
-fn article(page: &str) -> &str {
-    let start = page
-        .find("<article class=\"markdown-body\">\n")
-        .expect("article")
-        + 32;
-    let end = page.rfind("\n</article>").expect("article end");
-    &page[start..end]
 }
 
 /// The length of all text in the tree, to make sure a comparison is not
@@ -46,41 +36,6 @@ fn text_length(nodes: &[Node]) -> usize {
             Node::Element(element) => element.name.len() + text_length(&element.children),
         })
         .sum()
-}
-
-#[test]
-fn fixtures_match_the_reference_pages() {
-    let mut failures = Vec::new();
-    let mut count = 0;
-    for entry in fs::read_dir(root().join("fixtures")).unwrap() {
-        let path = entry.unwrap().path();
-        if path.extension().is_none_or(|e| e != "md") {
-            continue;
-        }
-        let id = path.file_stem().unwrap().to_string_lossy().into_owned();
-        let page = read(&root().join(format!("reference/pages/{id}-light.html")));
-        let expected = parse_html(article(&page));
-        let actual = parse(&read(&path));
-        count += 1;
-        assert!(
-            text_length(&expected) > 20,
-            "{id}: the reference page parsed to almost nothing"
-        );
-        if actual != expected {
-            failures.push(format!(
-                "{id}\n  expected: {}\n  actual:   {}",
-                to_html(&expected),
-                to_html(&actual)
-            ));
-        }
-    }
-    assert!(count >= 12, "found {count} fixtures");
-    assert!(
-        failures.is_empty(),
-        "{} of {count} fixtures differ:\n{}",
-        failures.len(),
-        failures.join("\n")
-    );
 }
 
 #[test]
@@ -125,7 +80,10 @@ fn check_corpus(corpus_name: &str, sanitize: bool, minimum_text: usize) {
     } else {
         (corpus_name.to_owned(), "html")
     };
-    let options = Options { sanitize };
+    let options = Options {
+        sanitize,
+        ..Options::default()
+    };
     let list =
         Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("tests/{name}-known-differences.txt"));
     let known: BTreeSet<u64> = read(&list)

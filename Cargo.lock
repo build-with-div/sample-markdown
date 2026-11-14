@@ -1487,6 +1487,7 @@ dependencies = [
 name = "markdown-highlight"
 version = "0.0.0"
 dependencies = [
+ "markdown-tree",
  "onig",
  "serde_json",
 ]
@@ -1497,6 +1498,7 @@ version = "0.0.0"
 dependencies = [
  "divui",
  "markdown-div",
+ "markdown-highlight",
  "markdown-tree",
  "serde_json",
 ]

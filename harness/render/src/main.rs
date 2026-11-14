@@ -9,8 +9,9 @@
 //!   this measures what the missing cascade costs. With `--source`, the
 //!   tree comes from the fixture's Markdown instead of the capture:
 //!   `markdown-tree` parses it, `markdown-div` mounts it, and the capture
-//!   supplies only the viewport. `report --source` checks that this tree
-//!   equals the captured one.
+//!   supplies only the viewport. `--highlight THEME` adds `@shikijs/rehype`
+//!   with that Shiki theme (`markdown-highlight`), as the reference pages
+//!   do. `report --source` checks that this tree equals the captured one.
 //! - `computed`: the same tree, with each element's Chromium computed style
 //!   copied onto it as typed declarations (`parse_literal` + `set_property`).
 //!   div-gap: G-CASCADE. This is measurement scaffolding, not an app
@@ -20,16 +21,17 @@
 //! Commands:
 //!
 //! ```text
-//! markdown-render render   <tree.json> <out.png> [--mode M | --source F.md] [--viewport WxH] [--scale S]
-//! markdown-render geometry <tree.json>           [--mode M | --source F.md] [--viewport WxH] [--scale S]
-//! markdown-render report   <tree.json>           [--source F.md]
+//! markdown-render render   <tree.json> <out.png> [--mode M | --source F.md [--highlight T]] [--viewport WxH] [--scale S]
+//! markdown-render geometry <tree.json>           [--mode M | --source F.md [--highlight T]] [--viewport WxH] [--scale S]
+//! markdown-render report   <tree.json>           [--source F.md [--highlight T]]
 //! ```
 
 use div::typed_style::parse_literal;
 use div::{
     Document, Element, EngineOptions, Error, RasterConfiguration, StyleProperty, ViewportMetrics,
 };
-use markdown_tree::Node;
+use markdown_highlight::{Highlighter, RehypeShiki};
+use markdown_tree::{Node, Options};
 use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -313,7 +315,8 @@ fn build_any(
         let report = builder.report();
         return Ok((builder.elements, report));
     };
-    let (elements, mut report, body) = build_from_source(document, source)?;
+    let (elements, mut report, body) =
+        build_from_source(document, source, config.highlight.as_deref())?;
     let difference = first_difference(&captured_lines(&tree["body"]), &tree_lines(&body));
     report["tree_equals_capture"] = json!(difference.is_none());
     report["tree_difference"] = json!(difference);
@@ -324,9 +327,21 @@ fn build_any(
 /// react-markdown's output, as Chromium parses it. The body holds "\n", the
 /// article and "\n\n\n" (the line endings after `</article>`, `</body>` and
 /// `</html>`); the article holds "\n", the Markdown's nodes and "\n".
-fn page_body(markdown: &str) -> Node {
+/// `highlight` is the Shiki theme `@shikijs/rehype` uses, if any.
+fn page_body(markdown: &str, highlight: Option<&str>) -> Node {
+    let highlighter = highlight.map(|_| Highlighter::bundled());
+    let rehype_shiki = highlighter
+        .as_ref()
+        .zip(highlight)
+        .map(|(highlighter, theme)| RehypeShiki { highlighter, theme });
+    let options = Options {
+        highlight: rehype_shiki
+            .as_ref()
+            .map(|h| h as &dyn markdown_tree::Highlight),
+        ..Options::default()
+    };
     let mut article = vec![Node::Text("\n".to_owned())];
-    article.extend(markdown_tree::parse(markdown));
+    article.extend(markdown_tree::parse_with(markdown, options));
     article.push(Node::Text("\n".to_owned()));
     let element = |name: &str, attributes: Vec<(String, String)>, children: Vec<Node>| {
         Node::Element(markdown_tree::Element {
@@ -369,9 +384,15 @@ fn merge_text(nodes: Vec<Node>) -> Vec<Node> {
 fn build_from_source(
     document: &Document,
     source: &Path,
+    highlight: Option<&str>,
 ) -> Result<(Vec<Element>, Value, Node), Box<dyn std::error::Error>> {
     let markdown = std::fs::read_to_string(source)?.replace("\r\n", "\n");
-    let body = page_body(&markdown);
+    if let Some(theme) = highlight {
+        Highlighter::bundled()
+            .theme(theme)
+            .ok_or_else(|| format!("unknown Shiki theme {theme}"))?;
+    }
+    let body = page_body(&markdown, highlight);
     let Node::Element(body_node) = &body else {
         unreachable!("page_body returns an element")
     };
@@ -447,11 +468,14 @@ struct Config {
     surface: Surface,
     /// The fixture's Markdown, for semantic mode from source.
     source: Option<PathBuf>,
+    /// The Shiki theme for `@shikijs/rehype`, with `source`.
+    highlight: Option<String>,
 }
 
 fn options(args: &[String], tree: &Value) -> Result<Config, Box<dyn std::error::Error>> {
     let mut mode = None;
     let mut source = None;
+    let mut highlight = None;
     let viewport = &tree["viewport"];
     let mut surface = Surface {
         width: viewport[0].as_f64().unwrap_or(800.0),
@@ -470,6 +494,7 @@ fn options(args: &[String], tree: &Value) -> Result<Config, Box<dyn std::error::
                 })
             }
             "--source" => source = Some(PathBuf::from(value)),
+            "--highlight" => highlight = Some(value.clone()),
             "--viewport" => {
                 let (w, h) = value.split_once('x').ok_or("--viewport is WxH")?;
                 surface.width = w.parse()?;
@@ -478,6 +503,9 @@ fn options(args: &[String], tree: &Value) -> Result<Config, Box<dyn std::error::
             "--scale" => surface.scale = value.parse()?,
             other => return Err(format!("unknown option {other}").into()),
         }
+    }
+    if highlight.is_some() && source.is_none() {
+        return Err("--highlight needs --source".into());
     }
     // The source gives tags, attributes and text, not computed styles.
     let mode = match (mode, &source) {
@@ -489,14 +517,15 @@ fn options(args: &[String], tree: &Value) -> Result<Config, Box<dyn std::error::
         mode,
         surface,
         source,
+        highlight,
     })
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let usage = "usage: markdown-render render <tree.json> <out.png> [--mode semantic|computed] \
-                 [--source F.md] [--viewport WxH] [--scale S] | geometry <tree.json> [options] \
-                 | report <tree.json> [--source F.md]";
+                 [--source F.md [--highlight THEME]] [--viewport WxH] [--scale S] \
+                 | geometry <tree.json> [options] | report <tree.json> [--source F.md [--highlight THEME]]";
     match args.first().map(String::as_str) {
         Some("render") => {
             let path = args.get(1).ok_or(usage)?;
@@ -612,13 +641,20 @@ mod tests {
         for name in ["image.md", "readme.md"] {
             let document = document(&surface).unwrap();
             let (elements, report, body) =
-                build_from_source(&document, &fixtures.join(name)).unwrap();
-            let starts = tree_lines(&body)
+                build_from_source(&document, &fixtures.join(name), Some("github-light")).unwrap();
+            let lines = tree_lines(&body);
+            let starts = lines
                 .iter()
                 .filter(|line| line.starts_with('<') && !line.starts_with("</"))
                 .count();
             assert_eq!(elements.len(), starts, "{name}");
             assert_eq!(report["images_not_loaded"], json!([]), "{name}");
+            // readme.md has an `sh` block, which Shiki highlights.
+            let highlighted = lines
+                .iter()
+                .filter(|line| line.contains("\"shiki github-light\""))
+                .count();
+            assert_eq!(highlighted, usize::from(name == "readme.md"), "{name}");
         }
     }
 }

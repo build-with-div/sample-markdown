@@ -217,7 +217,7 @@ fn parse_commas(value: &str) -> Vec<String> {
     tokens
 }
 
-fn is_html_space(c: char) -> bool {
+pub(crate) fn is_html_space(c: char) -> bool {
     matches!(c, ' ' | '\t' | '\n' | '\r' | '\u{c}')
 }
 
@@ -460,7 +460,10 @@ fn react_attribute(element: &str, name: &str, value: &Value) -> Option<String> {
 
 /// hast-util-from-parse5 and hastscript: an element's attributes as typed
 /// properties. Foreign elements keep strings.
-fn properties(namespace: Namespace, parsed: Vec<(String, String)>) -> Vec<(String, Value)> {
+pub(crate) fn properties(
+    namespace: Namespace,
+    parsed: Vec<(String, String)>,
+) -> Vec<(String, Value)> {
     parsed
         .into_iter()
         .map(|(name, raw)| {
@@ -476,7 +479,7 @@ fn properties(namespace: Namespace, parsed: Vec<(String, String)>) -> Vec<(Strin
 
 /// The attributes React writes for an element's properties, after
 /// react-markdown's URL filter.
-fn attributes(
+pub(crate) fn attributes(
     element: &str,
     namespace: Namespace,
     properties: Vec<(String, Value)>,

@@ -249,11 +249,20 @@ Measured by the computed mode here; each is S:
 - **Counters** (MD-7): list counter styles (`decimal`, `lower-roman`,
   `circle`, `square`), the `list-item` counter, `ol start`, `li value`, and
   `list-style-position: inside`.
+- **The `style` attribute** (MD-24, measured in P2-4b). Div keeps it but
+  does not apply it. Shiki puts every token color, and its block
+  background and color, in `style` attributes, and so does raw HTML that is
+  not sanitized. The attribute's declarations should become the element's
+  inline style, applied over author rules as in Chromium. Div already
+  parses single values at runtime (`typed_style::parse_literal`); this
+  adds splitting a declaration block into them.
 
 ## Not proposed
 
-- **Runtime CSS text for content.** GitHub strips `style` attributes, and
-  everything else is static sheets compiled at build time (D1 holds).
+- **Runtime style sheets for content.** Sheets stay static and compiled at
+  build time (D1 holds). The `style` attribute (§9) is per-element
+  declarations, not a sheet: GitHub's sanitizer strips it, but Shiki's
+  output depends on it.
 - **Mermaid.** It depends on JavaScript layout and text measurement. A Rust
   port of its layout is a separate project, and Div would need SVG text,
   strokes and markers first.

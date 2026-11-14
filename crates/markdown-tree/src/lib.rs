@@ -17,10 +17,12 @@
 //!    filter, hast-util-to-jsx-runtime's props and React's attribute rules.
 //! 4. html5ever parses React's markup as Chromium does inside `<article>`.
 //!
-//! `tests/reference.rs` checks the result against the committed reference
-//! pages and the CommonMark spec corpus, both built by the npm packages.
+//! `tests/reference.rs` checks the result against corpora the npm packages
+//! built (the fixtures, the CommonMark spec, GFM cases). The reference
+//! pages highlight code, so `markdown-highlight` checks those.
 //!
-//! [`parse_with`] can add rehype-sanitize with its default schema.
+//! [`parse_with`] can add rehype-sanitize with its default schema, and
+//! `@shikijs/rehype` with a [`Highlight`] (`markdown-highlight` ports Shiki).
 //!
 //! Not ported: React 19 hoists `<title>`, `<meta>` and `<link>` to the
 //! start of the output, and comrak does not tell an empty link title from
@@ -29,6 +31,7 @@
 mod dom;
 mod hast;
 mod react;
+mod rehype_shiki;
 mod sanitize;
 mod uri;
 
@@ -68,12 +71,38 @@ impl Element {
 }
 
 /// Options for [`parse_with`].
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct Options {
+#[derive(Clone, Copy, Default)]
+pub struct Options<'a> {
     /// Add rehype-sanitize with its default schema (GitHub's) after
     /// rehype-raw, for Markdown from untrusted sources. As in that pipeline,
     /// footnote ids get the `user-content-` prefix twice.
     pub sanitize: bool,
+    /// Add `@shikijs/rehype` (its core, with default options and one
+    /// theme) after them, highlighting code blocks with this highlighter.
+    pub highlight: Option<&'a dyn Highlight>,
+}
+
+impl std::fmt::Debug for Options<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Options")
+            .field("sanitize", &self.sanitize)
+            .field("highlight", &self.highlight.is_some())
+            .finish()
+    }
+}
+
+/// The Shiki highlighter `@shikijs/rehype` calls, with its theme chosen.
+/// `markdown-highlight` implements it.
+pub trait Highlight {
+    /// `getLoadedLanguages().includes(lang) || isSpecialLang(lang)`: a
+    /// loaded language or alias, a plain-text language or `ansi`.
+    fn has_language(&self, lang: &str) -> bool;
+
+    /// `codeToHast(code, { lang, theme })`: the root's children, attributes
+    /// named and written as Shiki's hast properties (`class`, `style`,
+    /// `tabindex`). `None` leaves the block as it is, where Shiki would
+    /// throw or where the highlighter does not port Shiki.
+    fn code_to_hast(&self, code: &str, lang: &str) -> Option<Vec<Node>>;
 }
 
 /// Parses Markdown into the nodes Chromium shows for react-markdown's output
@@ -87,9 +116,12 @@ pub fn parse_with(markdown: &str, options: Options) -> Vec<Node> {
     let hast = hast::from_markdown(markdown);
     let mut html = String::new();
     hast::write_html(&hast, &mut html);
-    let raw = dom::parse(&html, dom::Context::Template, |handles| {
+    let mut raw = dom::parse(&html, dom::Context::Template, |handles| {
         react::nodes(handles, options.sanitize)
     });
+    if let Some(highlight) = options.highlight {
+        rehype_shiki::apply(&mut raw, highlight);
+    }
     parse_html(&to_html(&raw))
 }
 

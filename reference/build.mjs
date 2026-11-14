@@ -1,10 +1,12 @@
 // Builds the Chromium reference pages for the Markdown fidelity fixtures.
 //
 // Each fixtures/<id>.md goes through react-markdown (remark-parse,
-// remark-gfm, remark-rehype, rehype-raw) and React's static renderer, the
-// pipeline a React app uses to show Markdown. The HTML is wrapped in
-// <article class="markdown-body"> with github-markdown-css and the page
-// style its readme recommends, once per theme.
+// remark-gfm, remark-rehype, rehype-raw, @shikijs/rehype) and React's
+// static renderer, the pipeline a React app uses to show Markdown with
+// highlighted code. The HTML is wrapped in <article class="markdown-body">
+// with github-markdown-css and the page style its readme recommends, once
+// per theme, with the Shiki theme of the same name (github-light,
+// github-dark).
 //
 //     cd reference && npm ci && node build.mjs
 //
@@ -17,6 +19,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
+import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
 import { bundledLanguages, bundledThemes, createHighlighter } from "shiki";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import { createHash } from "node:crypto";
@@ -62,10 +65,36 @@ const PAGE_CSS = `.markdown-body {
 // fragment, so they are dropped here.
 const PRELOAD = /<link rel="preload" as="image" href="[^"]*"\/>/g;
 
+// Highlighting: Shiki's grammars and themes for the languages below, with
+// the Oniguruma engine. The languages are loaded in Shiki's order: each
+// bundled language module lists its embedded languages first, and the list
+// is deduplicated.
+const HIGHLIGHT_LANGS = [
+  "rust", "shellscript", "javascript", "typescript", "json", "python",
+  "toml", "yaml", "css", "diff", "html",
+];
+const HIGHLIGHT_THEMES = ["github-light", "github-dark"];
+const langs = [
+  ...new Set((await Promise.all(HIGHLIGHT_LANGS.map(async (id) => (await bundledLanguages[id]()).default))).flat()),
+];
+const themes = await Promise.all(HIGHLIGHT_THEMES.map(async (id) => (await bundledThemes[id]()).default));
+// Shiki normalizes the theme objects it is given in place; the data files
+// are the bundled ones as published, so it gets copies.
+const highlighter = await createHighlighter({
+  themes: structuredClone(themes),
+  langs: structuredClone(langs),
+  engine: createOnigurumaEngine(import("shiki/wasm")),
+});
+
 // `sanitize` adds rehype-sanitize with its default schema (GitHub's) after
-// rehype-raw, as for untrusted Markdown. The pages use the default.
-function render(source, sanitize = false) {
-  const rehypePlugins = sanitize ? [rehypeRaw, rehypeSanitize] : [rehypeRaw];
+// rehype-raw, as for untrusted Markdown. `highlight` (a Shiki theme) adds
+// @shikijs/rehype's core with its default options after them: code blocks
+// in a loaded language become Shiki's highlighted `<pre>`. The pages use
+// no sanitizing and the Shiki theme of their own theme.
+function render(source, { sanitize = false, highlight } = {}) {
+  const rehypePlugins = [rehypeRaw];
+  if (sanitize) rehypePlugins.push(rehypeSanitize);
+  if (highlight) rehypePlugins.push([rehypeShikiFromHighlighter, highlighter, { theme: highlight }]);
   return renderToStaticMarkup(
     createElement(Markdown, { remarkPlugins: [remarkGfm], rehypePlugins }, source),
   ).replace(PRELOAD, "");
@@ -104,19 +133,23 @@ for (const asset of readdirSync(join(fixtures, "assets"))) {
 }
 
 const sha256 = (text) => createHash("sha256").update(text).digest("hex");
-const manifest = { schema: "sample-markdown-reference-v1", versions, fixtures: [] };
+const highlightVersions = Object.fromEntries(
+  ["@shikijs/rehype", "shiki"].map((name) => [name, JSON.parse(readFileSync(join(modules, name, "package.json"), "utf8")).version]),
+);
+const manifest = { schema: "sample-markdown-reference-v1", versions: { ...versions, ...highlightVersions }, fixtures: [] };
 for (const file of readdirSync(fixtures).filter((name) => name.endsWith(".md")).sort()) {
   const id = file.replace(/\.md$/, "");
   const source = readFileSync(join(fixtures, file), "utf8").replace(/\r\n/g, "\n");
-  const html = render(source);
   for (const theme of THEMES) {
     const name = `${id}-${theme}.html`;
-    writeFileSync(join(pages, name), page(id, theme, html));
+    const highlight = `github-${theme}`;
+    writeFileSync(join(pages, name), page(id, theme, render(source, { highlight })));
     manifest.fixtures.push({
       id: `${id}-${theme}`,
       source: `fixtures/${file}`,
       source_sha256: sha256(source),
       theme,
+      highlight,
       page: name,
     });
   }
@@ -127,14 +160,15 @@ console.log(`wrote ${manifest.fixtures.length} pages`);
 // Corpora for the Rust port's tree test (crates/markdown-tree): the
 // fixtures, the CommonMark spec's examples and this repository's GFM cases
 // (fixtures/gfm-cases.json), through the same pipeline, without and with
-// rehype-sanitize. The expected HTML is react-markdown's output, not the
-// spec's, since remark-gfm and rehype-raw are on.
+// rehype-sanitize, without highlighting. The expected HTML is
+// react-markdown's output, not the spec's, since remark-gfm and rehype-raw
+// are on.
 function writeCorpus(name, extraVersions, cases) {
   const examples = cases.map(({ number, section, markdown }) => {
     const example = { number, section, markdown };
     for (const [key, sanitize] of [["html", false], ["html_sanitized", true]]) {
       try {
-        example[key] = render(markdown, sanitize);
+        example[key] = render(markdown, { sanitize });
       } catch (error) {
         example[`${key}_error`] = String(error.message || error).split("\n")[0];
       }
@@ -192,18 +226,7 @@ writeCorpus(
 
 // Highlighting (crates/markdown-highlight): Shiki's grammars and themes,
 // copied verbatim for the Rust port, and the tokens Shiki makes from them.
-// The languages are loaded in Shiki's order: each bundled language module
-// lists its embedded languages first, and the list is deduplicated.
-const HIGHLIGHT_LANGS = [
-  "rust", "shellscript", "javascript", "typescript", "json", "python",
-  "toml", "yaml", "css", "diff", "html",
-];
-const HIGHLIGHT_THEMES = ["github-light", "github-dark"];
 const highlightData = join(root, "crates", "markdown-highlight", "data");
-const langs = [
-  ...new Set((await Promise.all(HIGHLIGHT_LANGS.map(async (id) => (await bundledLanguages[id]()).default))).flat()),
-];
-const themes = await Promise.all(HIGHLIGHT_THEMES.map(async (id) => (await bundledThemes[id]()).default));
 for (const dir of ["langs", "themes"]) {
   rmSync(join(highlightData, dir), { recursive: true, force: true });
   mkdirSync(join(highlightData, dir), { recursive: true });
@@ -215,7 +238,7 @@ for (const theme of themes) {
   writeFileSync(join(highlightData, "themes", `${theme.name}.json`), JSON.stringify(theme) + "\n");
 }
 const shikiVersions = Object.fromEntries(
-  ["shiki", "@shikijs/langs", "@shikijs/themes", "@shikijs/vscode-textmate", "@shikijs/engine-oniguruma"].map(
+  ["shiki", "@shikijs/langs", "@shikijs/themes", "@shikijs/vscode-textmate", "@shikijs/engine-oniguruma", "@shikijs/rehype"].map(
     (name) => [name, JSON.parse(readFileSync(join(modules, name, "package.json"), "utf8")).version],
   ),
 );
@@ -237,11 +260,6 @@ writeFileSync(
 // blocks (their text as react-markdown renders it, the input a highlighter
 // plugin receives; no language is Shiki's plain "text"), through
 // codeToTokensBase with the Oniguruma engine, once per theme.
-const highlighter = await createHighlighter({
-  themes,
-  langs,
-  engine: createOnigurumaEngine(import("shiki/wasm")),
-});
 const unescapeHtml = (text) =>
   text
     .replace(/&lt;/g, "<")
@@ -284,4 +302,62 @@ const highlightCorpus = {
 };
 writeFileSync(join(here, "corpus", "shiki.json"), JSON.stringify(highlightCorpus, null, 1) + "\n");
 console.log(`wrote ${langs.length} grammars, ${themes.length} themes, ${highlightCases.length} highlighting cases`);
+
+// The highlighted corpus: the whole pipeline with @shikijs/rehype, over the
+// fixtures, fixtures/shiki-cases.json as fenced code blocks, the CommonMark
+// spec's examples and the GFM cases. `html` uses github-light, `html_dark`
+// github-dark and `html_sanitized` github-light after rehype-sanitize.
+const fence = (lang, code) => {
+  const ticks = "`".repeat(Math.max(3, ...[...code.matchAll(/`+/g)].map((m) => m[0].length + 1)));
+  return `${ticks}${lang}\n${code}${code.endsWith("\n") ? "" : "\n"}${ticks}\n`;
+};
+const rehypeCases = [
+  ...readdirSync(fixtures)
+    .filter((name) => name.endsWith(".md"))
+    .sort()
+    .map((file) => ({
+      section: `fixtures/${file}`,
+      markdown: readFileSync(join(fixtures, file), "utf8").replace(/\r\n/g, "\n"),
+    })),
+  ...JSON.parse(readFileSync(join(fixtures, "shiki-cases.json"), "utf8")).map((test) => ({
+    section: `shiki-cases: ${test.name}`,
+    markdown: fence(test.lang, test.code),
+  })),
+  ...spec.tests.map((test) => ({
+    section: `commonmark ${test.number}: ${test.section}`,
+    markdown: test.markdown.replace(/→/g, "\t"),
+  })),
+  ...JSON.parse(readFileSync(join(fixtures, "gfm-cases.json"), "utf8")).map((test) => ({
+    section: `gfm: ${test.name}`,
+    markdown: test.markdown,
+  })),
+];
+const rehypeExamples = rehypeCases.map(({ section, markdown }, index) => {
+  const example = { number: index + 1, section, markdown };
+  for (const [key, options] of [
+    ["html", { highlight: "github-light" }],
+    ["html_dark", { highlight: "github-dark" }],
+    ["html_sanitized", { highlight: "github-light", sanitize: true }],
+  ]) {
+    try {
+      example[key] = render(markdown, options);
+    } catch (error) {
+      example[`${key}_error`] = String(error.message || error).split("\n")[0];
+    }
+  }
+  return example;
+});
+writeFileSync(
+  join(here, "corpus", "rehype-shiki.json"),
+  JSON.stringify(
+    {
+      schema: "sample-markdown-corpus-v1",
+      versions: { ...versions, ...shikiVersions, "commonmark-spec": specVersion },
+      examples: rehypeExamples,
+    },
+    null,
+    1,
+  ) + "\n",
+);
+console.log(`wrote ${rehypeExamples.length} rehype-shiki examples`);
 highlighter.dispose();
