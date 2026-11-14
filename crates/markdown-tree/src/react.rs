@@ -15,7 +15,7 @@ use crate::{Element, Namespace, Node};
 
 /// A hast property value, as hastscript parses an attribute.
 #[derive(Clone, Debug, PartialEq)]
-enum Value {
+pub(crate) enum Value {
     Str(String),
     True,
     Num(f64),
@@ -41,6 +41,13 @@ const SPACE_SEPARATED: &[&str] = &[
     "sandbox",
     "archive",
     "part",
+    "aria-controls",
+    "aria-describedby",
+    "aria-dropeffect",
+    "aria-flowto",
+    "aria-labelledby",
+    "aria-owns",
+    "aria-roledescription",
 ];
 const COMMA_SEPARATED: &[&str] = &["accept", "coords", "exportparts"];
 const NUMBER: &[&str] = &[
@@ -70,6 +77,18 @@ const NUMBER: &[&str] = &[
     "topmargin",
     "vspace",
     "results",
+    "aria-colcount",
+    "aria-colindex",
+    "aria-colspan",
+    "aria-level",
+    "aria-posinset",
+    "aria-rowcount",
+    "aria-rowindex",
+    "aria-rowspan",
+    "aria-setsize",
+    "aria-valuemax",
+    "aria-valuemin",
+    "aria-valuenow",
 ];
 const BOOLEAN: &[&str] = &[
     "allowfullscreen",
@@ -268,7 +287,7 @@ fn js_string(number: f64) -> String {
 
 impl Value {
     /// The value React writes for a prop it writes as a string.
-    fn string(&self) -> String {
+    pub(crate) fn string(&self) -> String {
         match self {
             Value::Str(s) => s.clone(),
             Value::True => "true".into(),
@@ -439,22 +458,39 @@ fn react_attribute(element: &str, name: &str, value: &Value) -> Option<String> {
     }
 }
 
-/// The attributes React writes for an element of rehype-raw's tree.
+/// hast-util-from-parse5 and hastscript: an element's attributes as typed
+/// properties. Foreign elements keep strings.
+fn properties(namespace: Namespace, parsed: Vec<(String, String)>) -> Vec<(String, Value)> {
+    parsed
+        .into_iter()
+        .map(|(name, raw)| {
+            let value = if namespace == Namespace::Html {
+                property(&name, &raw)
+            } else {
+                Value::Str(raw)
+            };
+            (name, value)
+        })
+        .collect()
+}
+
+/// The attributes React writes for an element's properties, after
+/// react-markdown's URL filter.
 fn attributes(
     element: &str,
     namespace: Namespace,
-    parsed: Vec<(String, String)>,
+    properties: Vec<(String, Value)>,
 ) -> Vec<(String, String)> {
     if namespace != Namespace::Html {
-        return parsed
+        return properties
             .into_iter()
             .filter(|(name, _)| !(name.len() > 2 && name[..2].eq_ignore_ascii_case("on")))
+            .map(|(name, value)| (name, value.string()))
             .collect();
     }
-    // hastscript and react-markdown.
+    // react-markdown.
     let mut props: Vec<(String, Value)> = Vec::new();
-    for (name, raw) in parsed {
-        let mut value = property(&name, &raw);
+    for (name, mut value) in properties {
         if is_url_attribute(element, &name) {
             let url = match &value {
                 Value::Num(n) if *n == 0.0 || n.is_nan() => String::new(),
@@ -547,29 +583,52 @@ fn attributes(
     out
 }
 
-/// rehype-raw's tree to React's: typed props and the table whitespace
-/// hast-util-to-jsx-runtime drops.
-pub(crate) fn nodes(handles: &[Handle]) -> Vec<Node> {
+/// rehype-raw's tree to React's: typed props, rehype-sanitize when asked,
+/// and the table whitespace hast-util-to-jsx-runtime drops.
+pub(crate) fn nodes(handles: &[Handle], sanitize: bool) -> Vec<Node> {
     let mut out = Vec::new();
+    convert(handles, sanitize, &mut Vec::new(), &mut out);
+    out
+}
+
+fn convert(handles: &[Handle], sanitize: bool, stack: &mut Vec<String>, out: &mut Vec<Node>) {
     for handle in handles {
         match &handle.data {
-            NodeData::Text { contents } => dom::push_text(&mut out, &contents.borrow()),
+            NodeData::Text { contents } => dom::push_text(out, &contents.borrow()),
             NodeData::Element { name, attrs, .. } => {
                 let namespace = dom::namespace(&name.ns);
                 let element = name.local.to_string();
-                let mut children = nodes(&dom::children(handle));
-                if namespace == Namespace::Html && TABLE.contains(&element.as_str()) {
-                    children.retain(
-                        |child| !matches!(child, Node::Text(t) if t.chars().all(is_html_space)),
-                    );
-                }
+                stack.push(element.clone());
+                let mut children = Vec::new();
+                convert(&dom::children(handle), sanitize, stack, &mut children);
+                stack.pop();
                 let parsed = attrs
                     .borrow()
                     .iter()
                     .map(|a| (attribute_name(&a.name), a.value.to_string()))
                     .collect();
+                let mut properties = properties(namespace, parsed);
+                if sanitize {
+                    if !crate::sanitize::allowed(&element, stack) {
+                        if !crate::sanitize::removed(&element) {
+                            for child in children {
+                                match child {
+                                    Node::Text(text) => dom::push_text(out, &text),
+                                    element => out.push(element),
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    properties = crate::sanitize::properties(&element, properties);
+                }
+                if namespace == Namespace::Html && TABLE.contains(&element.as_str()) {
+                    children.retain(
+                        |child| !matches!(child, Node::Text(t) if t.chars().all(is_html_space)),
+                    );
+                }
                 out.push(Node::Element(Element {
-                    attributes: attributes(&element, namespace, parsed),
+                    attributes: attributes(&element, namespace, properties),
                     namespace,
                     name: element,
                     children,
@@ -578,7 +637,6 @@ pub(crate) fn nodes(handles: &[Handle]) -> Vec<Node> {
             _ => {}
         }
     }
-    out
 }
 
 const VOID: &[&str] = &[
@@ -650,7 +708,11 @@ mod tests {
             .iter()
             .map(|(n, v)| (n.to_string(), v.to_string()))
             .collect();
-        attributes(element, Namespace::Html, parsed)
+        attributes(
+            element,
+            Namespace::Html,
+            properties(Namespace::Html, parsed),
+        )
     }
 
     fn pairs(list: &[(&str, &str)]) -> Vec<(String, String)> {

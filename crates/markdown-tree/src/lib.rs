@@ -20,6 +20,8 @@
 //! `tests/reference.rs` checks the result against the committed reference
 //! pages and the CommonMark spec corpus, both built by the npm packages.
 //!
+//! [`parse_with`] can add rehype-sanitize with its default schema.
+//!
 //! Not ported: React 19 hoists `<title>`, `<meta>` and `<link>` to the
 //! start of the output, and comrak does not tell an empty link title from
 //! a missing one.
@@ -27,6 +29,7 @@
 mod dom;
 mod hast;
 mod react;
+mod sanitize;
 mod uri;
 
 /// The namespace of an element.
@@ -64,13 +67,29 @@ impl Element {
     }
 }
 
+/// Options for [`parse_with`].
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Options {
+    /// Add rehype-sanitize with its default schema (GitHub's) after
+    /// rehype-raw, for Markdown from untrusted sources. As in that pipeline,
+    /// footnote ids get the `user-content-` prefix twice.
+    pub sanitize: bool,
+}
+
 /// Parses Markdown into the nodes Chromium shows for react-markdown's output
 /// (with remark-gfm and rehype-raw), as children of the container element.
 pub fn parse(markdown: &str) -> Vec<Node> {
+    parse_with(markdown, Options::default())
+}
+
+/// [`parse`] with options.
+pub fn parse_with(markdown: &str, options: Options) -> Vec<Node> {
     let hast = hast::from_markdown(markdown);
     let mut html = String::new();
     hast::write_html(&hast, &mut html);
-    let raw = dom::parse(&html, dom::Context::Template, react::nodes);
+    let raw = dom::parse(&html, dom::Context::Template, |handles| {
+        react::nodes(handles, options.sanitize)
+    });
     parse_html(&to_html(&raw))
 }
 

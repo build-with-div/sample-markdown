@@ -4,6 +4,7 @@
   "react-markdown": "10.1.0",
   "remark-gfm": "4.0.1",
   "rehype-raw": "7.0.0",
+  "rehype-sanitize": "6.0.0",
   "react": "19.3.1",
   "react-dom": "19.3.1",
   "github-markdown-css": "5.9.0"
@@ -13,313 +14,449 @@
    "number": 1,
    "section": "table: escaped pipe and inline code",
    "markdown": "| a | b |\n| - | - |\n| `x \\| y` | c \\| d |\n",
-   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td><code>x | y</code></td><td>c | d</td></tr></tbody></table>"
+   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td><code>x | y</code></td><td>c | d</td></tr></tbody></table>",
+   "html_sanitized": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td><code>x | y</code></td><td>c | d</td></tr></tbody></table>"
   },
   {
    "number": 2,
    "section": "table: missing and extra cells",
    "markdown": "| a | b | c |\n| --- | :-: | --: |\n| 1 |\n| 1 | 2 | 3 | 4 |\n",
-   "html": "<table><thead><tr><th>a</th><th style=\"text-align:center\">b</th><th style=\"text-align:right\">c</th></tr></thead><tbody><tr><td>1</td><td style=\"text-align:center\"></td><td style=\"text-align:right\"></td></tr><tr><td>1</td><td style=\"text-align:center\">2</td><td style=\"text-align:right\">3</td></tr></tbody></table>"
+   "html": "<table><thead><tr><th>a</th><th style=\"text-align:center\">b</th><th style=\"text-align:right\">c</th></tr></thead><tbody><tr><td>1</td><td style=\"text-align:center\"></td><td style=\"text-align:right\"></td></tr><tr><td>1</td><td style=\"text-align:center\">2</td><td style=\"text-align:right\">3</td></tr></tbody></table>",
+   "html_sanitized": "<table><thead><tr><th>a</th><th style=\"text-align:center\">b</th><th style=\"text-align:right\">c</th></tr></thead><tbody><tr><td>1</td><td style=\"text-align:center\"></td><td style=\"text-align:right\"></td></tr><tr><td>1</td><td style=\"text-align:center\">2</td><td style=\"text-align:right\">3</td></tr></tbody></table>"
   },
   {
    "number": 3,
    "section": "table: no body",
    "markdown": "| a | b |\n| --- | --- |\n",
-   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead></table>"
+   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead></table>",
+   "html_sanitized": "<table><thead><tr><th>a</th><th>b</th></tr></thead></table>"
   },
   {
    "number": 4,
    "section": "table: no outer pipes",
    "markdown": "a | b\n--|--\n1 | 2\n",
-   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>"
+   "html": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>",
+   "html_sanitized": "<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>"
   },
   {
    "number": 5,
    "section": "table: interrupted by a block",
    "markdown": "| a |\n| - |\n| b |\n> quote\n",
-   "html": "<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>b</td></tr></tbody></table>\n<blockquote>\n<p>quote</p>\n</blockquote>"
+   "html": "<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>b</td></tr></tbody></table>\n<blockquote>\n<p>quote</p>\n</blockquote>",
+   "html_sanitized": "<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>b</td></tr></tbody></table>\n<blockquote>\n<p>quote</p>\n</blockquote>"
   },
   {
    "number": 6,
    "section": "table: inline content",
    "markdown": "| **b** | *i* | [l](/u) | ![i](/i.png) |\n|---|---|---|---|\n| ~~s~~ | <kbd>K</kbd> | x<br>y | &amp; |\n",
-   "html": "<table><thead><tr><th><strong>b</strong></th><th><em>i</em></th><th><a href=\"/u\">l</a></th><th><img src=\"/i.png\" alt=\"i\"/></th></tr></thead><tbody><tr><td><del>s</del></td><td><kbd>K</kbd></td><td>x<br/>y</td><td>&amp;</td></tr></tbody></table>"
+   "html": "<table><thead><tr><th><strong>b</strong></th><th><em>i</em></th><th><a href=\"/u\">l</a></th><th><img src=\"/i.png\" alt=\"i\"/></th></tr></thead><tbody><tr><td><del>s</del></td><td><kbd>K</kbd></td><td>x<br/>y</td><td>&amp;</td></tr></tbody></table>",
+   "html_sanitized": "<table><thead><tr><th><strong>b</strong></th><th><em>i</em></th><th><a href=\"/u\">l</a></th><th><img src=\"/i.png\" alt=\"i\"/></th></tr></thead><tbody><tr><td><del>s</del></td><td><kbd>K</kbd></td><td>x<br/>y</td><td>&amp;</td></tr></tbody></table>"
   },
   {
    "number": 7,
    "section": "table: after a paragraph",
    "markdown": "Paragraph\n| a | b |\n| - | - |\n| 1 | 2 |\n",
-   "html": "<p>Paragraph</p>\n<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>"
+   "html": "<p>Paragraph</p>\n<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>",
+   "html_sanitized": "<p>Paragraph</p>\n<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>"
   },
   {
    "number": 8,
    "section": "task list: upper-case X",
    "markdown": "- [X] done\n- [ ] open\n",
-   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> done</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> open</li>\n</ul>"
+   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> done</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> open</li>\n</ul>",
+   "html_sanitized": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> done</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> open</li>\n</ul>"
   },
   {
    "number": 9,
    "section": "task list: ordered",
    "markdown": "1. [x] one\n2. [ ] two\n",
-   "html": "<ol class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> two</li>\n</ol>"
+   "html": "<ol class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> two</li>\n</ol>",
+   "html_sanitized": "<ol class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> two</li>\n</ol>"
   },
   {
    "number": 10,
    "section": "task list: loose",
    "markdown": "- [x] one\n\n- [ ] two\n",
-   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n</li>\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\"/> two</p>\n</li>\n</ul>"
+   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n</li>\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\"/> two</p>\n</li>\n</ul>",
+   "html_sanitized": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n</li>\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\"/> two</p>\n</li>\n</ul>"
   },
   {
    "number": 11,
    "section": "task list: with a second paragraph",
    "markdown": "- [x] one\n\n  more text\n",
-   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n<p>more text</p>\n</li>\n</ul>"
+   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n<p>more text</p>\n</li>\n</ul>",
+   "html_sanitized": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> one</p>\n<p>more text</p>\n</li>\n</ul>"
   },
   {
    "number": 12,
    "section": "task list: mixed with plain items",
    "markdown": "- plain\n- [x] task\n- [ ]\n- [ ]not a task\n",
-   "html": "<ul class=\"contains-task-list\">\n<li>plain</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> task</li>\n<li>[ ]</li>\n<li>[ ]not a task</li>\n</ul>"
+   "html": "<ul class=\"contains-task-list\">\n<li>plain</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> task</li>\n<li>[ ]</li>\n<li>[ ]not a task</li>\n</ul>",
+   "html_sanitized": "<ul class=\"contains-task-list\">\n<li>plain</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> task</li>\n<li>[ ]</li>\n<li>[ ]not a task</li>\n</ul>"
   },
   {
    "number": 13,
    "section": "task list: empty after marker",
    "markdown": "- [x] \n",
-   "html": "<ul>\n<li>[x]</li>\n</ul>"
+   "html": "<ul>\n<li>[x]</li>\n</ul>",
+   "html_sanitized": "<ul>\n<li>[x]</li>\n</ul>"
   },
   {
    "number": 14,
    "section": "strikethrough: single and double",
    "markdown": "~one~ and ~~two~~ and ~~~three~~~\n",
-   "html": "<p><del>one</del> and <del>two</del> and ~~~three~~~</p>"
+   "html": "<p><del>one</del> and <del>two</del> and ~~~three~~~</p>",
+   "html_sanitized": "<p><del>one</del> and <del>two</del> and ~~~three~~~</p>"
   },
   {
    "number": 15,
    "section": "strikethrough: unmatched",
    "markdown": "~~a ~b~~ c~\n",
-   "html": "<p><del>a ~b</del> c~</p>"
+   "html": "<p><del>a ~b</del> c~</p>",
+   "html_sanitized": "<p><del>a ~b</del> c~</p>"
   },
   {
    "number": 16,
    "section": "strikethrough: across emphasis",
    "markdown": "~~*a*~~ *~~b~~*\n",
-   "html": "<p><del><em>a</em></del> <em><del>b</del></em></p>"
+   "html": "<p><del><em>a</em></del> <em><del>b</del></em></p>",
+   "html_sanitized": "<p><del><em>a</em></del> <em><del>b</del></em></p>"
   },
   {
    "number": 17,
    "section": "autolink: www and trailing punctuation",
    "markdown": "Visit www.commonmark.org. Or www.commonmark.org/a.b, then (www.x.com) and www.x.com/(a)).\n",
-   "html": "<p>Visit <a href=\"http://www.commonmark.org\">www.commonmark.org</a>. Or <a href=\"http://www.commonmark.org/a.b\">www.commonmark.org/a.b</a>, then (<a href=\"http://www.x.com\">www.x.com</a>) and <a href=\"http://www.x.com/(a)\">www.x.com/(a)</a>).</p>"
+   "html": "<p>Visit <a href=\"http://www.commonmark.org\">www.commonmark.org</a>. Or <a href=\"http://www.commonmark.org/a.b\">www.commonmark.org/a.b</a>, then (<a href=\"http://www.x.com\">www.x.com</a>) and <a href=\"http://www.x.com/(a)\">www.x.com/(a)</a>).</p>",
+   "html_sanitized": "<p>Visit <a href=\"http://www.commonmark.org\">www.commonmark.org</a>. Or <a href=\"http://www.commonmark.org/a.b\">www.commonmark.org/a.b</a>, then (<a href=\"http://www.x.com\">www.x.com</a>) and <a href=\"http://www.x.com/(a)\">www.x.com/(a)</a>).</p>"
   },
   {
    "number": 18,
    "section": "autolink: http with path and query",
    "markdown": "See https://example.com/path?a=1&b=2#frag and http://x.org/~u/.\n",
-   "html": "<p>See <a href=\"https://example.com/path?a=1&amp;b=2#frag\">https://example.com/path?a=1&amp;b=2#frag</a> and <a href=\"http://x.org/~u/\">http://x.org/~u/</a>.</p>"
+   "html": "<p>See <a href=\"https://example.com/path?a=1&amp;b=2#frag\">https://example.com/path?a=1&amp;b=2#frag</a> and <a href=\"http://x.org/~u/\">http://x.org/~u/</a>.</p>",
+   "html_sanitized": "<p>See <a href=\"https://example.com/path?a=1&amp;b=2#frag\">https://example.com/path?a=1&amp;b=2#frag</a> and <a href=\"http://x.org/~u/\">http://x.org/~u/</a>.</p>"
   },
   {
    "number": 19,
    "section": "autolink: email",
    "markdown": "Mail foo@bar.baz, a.b-c_d@a.b. and hello@mail+xyz.example.\n",
-   "html": "<p>Mail <a href=\"mailto:foo@bar.baz\">foo@bar.baz</a>, <a href=\"mailto:a.b-c_d@a.b\">a.b-c_d@a.b</a>. and hello@mail+xyz.example.</p>"
+   "html": "<p>Mail <a href=\"mailto:foo@bar.baz\">foo@bar.baz</a>, <a href=\"mailto:a.b-c_d@a.b\">a.b-c_d@a.b</a>. and hello@mail+xyz.example.</p>",
+   "html_sanitized": "<p>Mail <a href=\"mailto:foo@bar.baz\">foo@bar.baz</a>, <a href=\"mailto:a.b-c_d@a.b\">a.b-c_d@a.b</a>. and hello@mail+xyz.example.</p>"
   },
   {
    "number": 20,
    "section": "autolink: entity at the end",
    "markdown": "www.google.com/search?q=commonmark&hl;\n",
-   "html": "<p><a href=\"http://www.google.com/search?q=commonmark\">www.google.com/search?q=commonmark</a>&amp;hl;</p>"
+   "html": "<p><a href=\"http://www.google.com/search?q=commonmark\">www.google.com/search?q=commonmark</a>&amp;hl;</p>",
+   "html_sanitized": "<p><a href=\"http://www.google.com/search?q=commonmark\">www.google.com/search?q=commonmark</a>&amp;hl;</p>"
   },
   {
    "number": 21,
    "section": "autolink: inside a link",
    "markdown": "[www.x.com](https://y.com) and <https://z.com>\n",
-   "html": "<p><a href=\"https://y.com\">www.x.com</a> and <a href=\"https://z.com\">https://z.com</a></p>"
+   "html": "<p><a href=\"https://y.com\">www.x.com</a> and <a href=\"https://z.com\">https://z.com</a></p>",
+   "html_sanitized": "<p><a href=\"https://y.com\">www.x.com</a> and <a href=\"https://z.com\">https://z.com</a></p>"
   },
   {
    "number": 22,
    "section": "footnote: repeated reference",
    "markdown": "One[^a] two[^a] three[^b].\n\n[^a]: First.\n[^b]: Second.\n",
-   "html": "<p>One<sup><a href=\"#user-content-fn-a\" id=\"user-content-fnref-a\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup> two<sup><a href=\"#user-content-fn-a\" id=\"user-content-fnref-a-2\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup> three<sup><a href=\"#user-content-fn-b\" id=\"user-content-fnref-b\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">2</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-a\">\n<p>First. <a href=\"#user-content-fnref-a\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a> <a href=\"#user-content-fnref-a-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 1-2\" class=\"data-footnote-backref\">↩<sup>2</sup></a></p>\n</li>\n<li id=\"user-content-fn-b\">\n<p>Second. <a href=\"#user-content-fnref-b\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>"
+   "html": "<p>One<sup><a href=\"#user-content-fn-a\" id=\"user-content-fnref-a\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup> two<sup><a href=\"#user-content-fn-a\" id=\"user-content-fnref-a-2\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup> three<sup><a href=\"#user-content-fn-b\" id=\"user-content-fnref-b\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">2</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-a\">\n<p>First. <a href=\"#user-content-fnref-a\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a> <a href=\"#user-content-fnref-a-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 1-2\" class=\"data-footnote-backref\">↩<sup>2</sup></a></p>\n</li>\n<li id=\"user-content-fn-b\">\n<p>Second. <a href=\"#user-content-fnref-b\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>",
+   "html_sanitized": "<p>One<sup><a href=\"#user-content-fn-a\" id=\"user-content-user-content-fnref-a\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">1</a></sup> two<sup><a href=\"#user-content-fn-a\" id=\"user-content-user-content-fnref-a-2\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">1</a></sup> three<sup><a href=\"#user-content-fn-b\" id=\"user-content-user-content-fnref-b\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">2</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"user-content-footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-user-content-fn-a\">\n<p>First. <a href=\"#user-content-fnref-a\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a> <a href=\"#user-content-fnref-a-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 1-2\" class=\"data-footnote-backref\">↩<sup>2</sup></a></p>\n</li>\n<li id=\"user-content-user-content-fn-b\">\n<p>Second. <a href=\"#user-content-fnref-b\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>"
   },
   {
    "number": 23,
    "section": "footnote: missing definition",
    "markdown": "Text[^missing].\n",
-   "html": "<p>Text[^missing].</p>"
+   "html": "<p>Text[^missing].</p>",
+   "html_sanitized": "<p>Text[^missing].</p>"
   },
   {
    "number": 24,
    "section": "footnote: unused definition",
    "markdown": "Text.\n\n[^unused]: Never referenced.\n",
-   "html": "<p>Text.</p>"
+   "html": "<p>Text.</p>",
+   "html_sanitized": "<p>Text.</p>"
   },
   {
    "number": 25,
    "section": "footnote: multi-paragraph definition",
    "markdown": "Text[^long].\n\n[^long]: First paragraph.\n\n    Second paragraph.\n\n    ```\n    code\n    ```\n",
-   "html": "<p>Text<sup><a href=\"#user-content-fn-long\" id=\"user-content-fnref-long\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-long\">\n<p>First paragraph.</p>\n<p>Second paragraph.</p>\n<pre><code>code\n</code></pre>\n<a href=\"#user-content-fnref-long\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>"
+   "html": "<p>Text<sup><a href=\"#user-content-fn-long\" id=\"user-content-fnref-long\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-long\">\n<p>First paragraph.</p>\n<p>Second paragraph.</p>\n<pre><code>code\n</code></pre>\n<a href=\"#user-content-fnref-long\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>",
+   "html_sanitized": "<p>Text<sup><a href=\"#user-content-fn-long\" id=\"user-content-user-content-fnref-long\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"user-content-footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-user-content-fn-long\">\n<p>First paragraph.</p>\n<p>Second paragraph.</p>\n<pre><code>code\n</code></pre>\n<a href=\"#user-content-fnref-long\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>"
   },
   {
    "number": 26,
    "section": "footnote: reference inside a definition",
    "markdown": "A[^1].\n\n[^1]: See[^2].\n[^2]: Nested.\n",
-   "html": "<p>A<sup><a href=\"#user-content-fn-1\" id=\"user-content-fnref-1\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-1\">\n<p>See<sup><a href=\"#user-content-fn-2\" id=\"user-content-fnref-2\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">2</a></sup>. <a href=\"#user-content-fnref-1\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n<li id=\"user-content-fn-2\">\n<p>Nested. <a href=\"#user-content-fnref-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>"
+   "html": "<p>A<sup><a href=\"#user-content-fn-1\" id=\"user-content-fnref-1\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-1\">\n<p>See<sup><a href=\"#user-content-fn-2\" id=\"user-content-fnref-2\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">2</a></sup>. <a href=\"#user-content-fnref-1\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n<li id=\"user-content-fn-2\">\n<p>Nested. <a href=\"#user-content-fnref-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>",
+   "html_sanitized": "<p>A<sup><a href=\"#user-content-fn-1\" id=\"user-content-user-content-fnref-1\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"user-content-footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-user-content-fn-1\">\n<p>See<sup><a href=\"#user-content-fn-2\" id=\"user-content-user-content-fnref-2\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">2</a></sup>. <a href=\"#user-content-fnref-1\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n<li id=\"user-content-user-content-fn-2\">\n<p>Nested. <a href=\"#user-content-fnref-2\" data-footnote-backref=\"\" aria-label=\"Back to reference 2\" class=\"data-footnote-backref\">↩</a></p>\n</li>\n</ol>\n</section>"
   },
   {
    "number": 27,
    "section": "footnote: label case and spaces",
    "markdown": "A[^Some Label].\n\n[^some label]: Def.\n",
-   "html": "<p>A<a href=\"Def.\">^Some Label</a>.</p>"
+   "html": "<p>A<a href=\"Def.\">^Some Label</a>.</p>",
+   "html_sanitized": "<p>A<a href=\"Def.\">^Some Label</a>.</p>"
   },
   {
    "number": 28,
    "section": "footnote: definition ending in a list",
    "markdown": "A[^l].\n\n[^l]: Items:\n    - one\n    - two\n",
-   "html": "<p>A<sup><a href=\"#user-content-fn-l\" id=\"user-content-fnref-l\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-l\">\n<p>Items:</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<a href=\"#user-content-fnref-l\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>"
+   "html": "<p>A<sup><a href=\"#user-content-fn-l\" id=\"user-content-fnref-l\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-fn-l\">\n<p>Items:</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<a href=\"#user-content-fnref-l\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>",
+   "html_sanitized": "<p>A<sup><a href=\"#user-content-fn-l\" id=\"user-content-user-content-fnref-l\" data-footnote-ref=\"\" aria-describedby=\"user-content-footnote-label\">1</a></sup>.</p>\n<section data-footnotes=\"\" class=\"footnotes\"><h2 class=\"sr-only\" id=\"user-content-footnote-label\">Footnotes</h2>\n<ol>\n<li id=\"user-content-user-content-fn-l\">\n<p>Items:</p>\n<ul>\n<li>one</li>\n<li>two</li>\n</ul>\n<a href=\"#user-content-fnref-l\" data-footnote-backref=\"\" aria-label=\"Back to reference 1\" class=\"data-footnote-backref\">↩</a>\n</li>\n</ol>\n</section>"
   },
   {
    "number": 29,
    "section": "html: details with markdown",
    "markdown": "<details>\n<summary>Title</summary>\n\n- item **bold**\n\n</details>\n",
-   "html": "<details>\n<summary>Title</summary>\n<ul>\n<li>item <strong>bold</strong></li>\n</ul>\n</details>"
+   "html": "<details>\n<summary>Title</summary>\n<ul>\n<li>item <strong>bold</strong></li>\n</ul>\n</details>",
+   "html_sanitized": "<details>\n<summary>Title</summary>\n<ul>\n<li>item <strong>bold</strong></li>\n</ul>\n</details>"
   },
   {
    "number": 30,
    "section": "html: img with attributes",
    "markdown": "<img src=\"a.png\" width=\"100\" height=\"50\" alt=\"x\" align=\"right\">\n\n<p align=\"center\"><img src=\"b.png\" width=\"40%\"></p>\n",
-   "html": "<img src=\"a.png\" width=\"100\" height=\"50\" alt=\"x\" align=\"right\"/>\n<p align=\"center\"><img src=\"b.png\" width=\"40%\"/></p>"
+   "html": "<img src=\"a.png\" width=\"100\" height=\"50\" alt=\"x\" align=\"right\"/>\n<p align=\"center\"><img src=\"b.png\" width=\"40%\"/></p>",
+   "html_sanitized": "<img src=\"a.png\" width=\"100\" height=\"50\" alt=\"x\" align=\"right\"/>\n<p align=\"center\"><img src=\"b.png\" width=\"40%\"/></p>"
   },
   {
    "number": 31,
    "section": "html: picture and source",
    "markdown": "<picture>\n<source media=\"(prefers-color-scheme: dark)\" srcset=\"d.png\">\n<img src=\"l.png\" alt=\"logo\">\n</picture>\n",
-   "html": "<picture>\n<source media=\"(prefers-color-scheme: dark)\" srcSet=\"d.png\"/>\n<img src=\"l.png\" alt=\"logo\"/>\n</picture>"
+   "html": "<picture>\n<source media=\"(prefers-color-scheme: dark)\" srcSet=\"d.png\"/>\n<img src=\"l.png\" alt=\"logo\"/>\n</picture>",
+   "html_sanitized": "<picture>\n<source media=\"(prefers-color-scheme: dark)\" srcSet=\"d.png\"/>\n<img src=\"l.png\" alt=\"logo\"/>\n</picture>"
   },
   {
    "number": 32,
    "section": "html: inline elements",
    "markdown": "H<sub>2</sub>O, x<sup>2</sup>, <kbd>Ctrl</kbd>, <ins>new</ins>, <del>old</del>, <mark>hi</mark>, <abbr title=\"Hyper\">H</abbr>, <q>quote</q>\n",
-   "html": "<p>H<sub>2</sub>O, x<sup>2</sup>, <kbd>Ctrl</kbd>, <ins>new</ins>, <del>old</del>, <mark>hi</mark>, <abbr title=\"Hyper\">H</abbr>, <q>quote</q></p>"
+   "html": "<p>H<sub>2</sub>O, x<sup>2</sup>, <kbd>Ctrl</kbd>, <ins>new</ins>, <del>old</del>, <mark>hi</mark>, <abbr title=\"Hyper\">H</abbr>, <q>quote</q></p>",
+   "html_sanitized": "<p>H<sub>2</sub>O, x<sup>2</sup>, <kbd>Ctrl</kbd>, <ins>new</ins>, <del>old</del>, hi, H, <q>quote</q></p>"
   },
   {
    "number": 33,
    "section": "html: comment and br",
    "markdown": "a<!-- hidden -->b<br>c<br/>d\n\n<!--\nblock comment\n-->\n",
-   "html": "<p>ab<br/>c<br/>d</p>\n"
+   "html": "<p>ab<br/>c<br/>d</p>\n",
+   "html_sanitized": "<p>ab<br/>c<br/>d</p>\n"
   },
   {
    "number": 34,
    "section": "html: definition list",
    "markdown": "<dl>\n<dt>Term</dt>\n<dd>Definition</dd>\n</dl>\n",
-   "html": "<dl>\n<dt>Term</dt>\n<dd>Definition</dd>\n</dl>"
+   "html": "<dl>\n<dt>Term</dt>\n<dd>Definition</dd>\n</dl>",
+   "html_sanitized": "<dl>\n<dt>Term</dt>\n<dd>Definition</dd>\n</dl>"
   },
   {
    "number": 35,
    "section": "html: table with align and colspan",
    "markdown": "<table>\n<tr><th colspan=\"2\" align=\"left\">h</th></tr>\n<tr><td align=\"right\">1</td><td style=\"color: red\">2</td></tr>\n</table>\n",
-   "html": "<table><tbody><tr><th colSpan=\"2\" style=\"text-align:left\">h</th></tr><tr><td style=\"text-align:right\">1</td><td style=\"color:red\">2</td></tr></tbody></table>"
+   "html": "<table><tbody><tr><th colSpan=\"2\" style=\"text-align:left\">h</th></tr><tr><td style=\"text-align:right\">1</td><td style=\"color:red\">2</td></tr></tbody></table>",
+   "html_sanitized": "<table><tbody><tr><th colSpan=\"2\" style=\"text-align:left\">h</th></tr><tr><td style=\"text-align:right\">1</td><td>2</td></tr></tbody></table>"
   },
   {
    "number": 36,
    "section": "html: unclosed inline element",
    "markdown": "a <b>bold\n\nnext\n",
-   "html": "<p>a <b>bold</b></p><b>\n<p>next</p></b>"
+   "html": "<p>a <b>bold</b></p><b>\n<p>next</p></b>",
+   "html_sanitized": "<p>a <b>bold</b></p><b>\n<p>next</p></b>"
   },
   {
    "number": 37,
    "section": "html: anchor with name and target",
    "markdown": "<a name=\"top\"></a>\n\n<a href=\"https://x.com\" target=\"_blank\" rel=\"noopener\">x</a>\n",
-   "html": "<p><a name=\"top\"></a></p>\n<p><a href=\"https://x.com\" target=\"_blank\" rel=\"noopener\">x</a></p>"
+   "html": "<p><a name=\"top\"></a></p>\n<p><a href=\"https://x.com\" target=\"_blank\" rel=\"noopener\">x</a></p>",
+   "html_sanitized": "<p><a name=\"user-content-top\"></a></p>\n<p><a href=\"https://x.com\">x</a></p>"
   },
   {
    "number": 38,
    "section": "html: input checkbox",
    "markdown": "<input type=\"checkbox\" checked disabled> raw\n",
-   "html": "<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> raw</p>"
+   "html": "<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> raw</p>",
+   "html_sanitized": "<p><input type=\"checkbox\" disabled=\"\" checked=\"\"/> raw</p>"
   },
   {
    "number": 39,
    "section": "html: div with markdown after blank line",
    "markdown": "<div align=\"center\">\n\n# Title\n\n</div>\n",
-   "html": "<div align=\"center\">\n<h1>Title</h1>\n</div>"
+   "html": "<div align=\"center\">\n<h1>Title</h1>\n</div>",
+   "html_sanitized": "<div align=\"center\">\n<h1>Title</h1>\n</div>"
   },
   {
    "number": 40,
    "section": "html: unsafe link and image",
    "markdown": "[x](javascript:alert(1)) <a href=\"javascript:void(0)\">y</a> ![z](data:image/png;base64,AA)\n",
-   "html": "<p><a href=\"\">x</a> <a href=\"\">y</a> <img alt=\"z\"/></p>"
+   "html": "<p><a href=\"\">x</a> <a href=\"\">y</a> <img alt=\"z\"/></p>",
+   "html_sanitized": "<p><a>x</a> <a>y</a> <img alt=\"z\"/></p>"
   },
   {
    "number": 41,
    "section": "entities and escapes",
    "markdown": "&copy; &nbsp; &#x1F600; &unknown; \\<b\\> \\& \\\\\n",
-   "html": "<p>©   😀 &amp;unknown; &lt;b&gt; &amp; \\</p>"
+   "html": "<p>©   😀 &amp;unknown; &lt;b&gt; &amp; \\</p>",
+   "html_sanitized": "<p>©   😀 &amp;unknown; &lt;b&gt; &amp; \\</p>"
   },
   {
    "number": 42,
    "section": "headings with trailing hashes",
    "markdown": "# One #\n## Two ##   \n###### Six\n####### Seven\n",
-   "html": "<h1>One</h1>\n<h2>Two</h2>\n<h6>Six</h6>\n<p>####### Seven</p>"
+   "html": "<h1>One</h1>\n<h2>Two</h2>\n<h6>Six</h6>\n<p>####### Seven</p>",
+   "html_sanitized": "<h1>One</h1>\n<h2>Two</h2>\n<h6>Six</h6>\n<p>####### Seven</p>"
   },
   {
    "number": 43,
    "section": "setext and thematic breaks",
    "markdown": "Title\n=====\n\nSub\n---\n\n***\n___\n- - -\n",
-   "html": "<h1>Title</h1>\n<h2>Sub</h2>\n<hr/>\n<hr/>\n<hr/>"
+   "html": "<h1>Title</h1>\n<h2>Sub</h2>\n<hr/>\n<hr/>\n<hr/>",
+   "html_sanitized": "<h1>Title</h1>\n<h2>Sub</h2>\n<hr/>\n<hr/>\n<hr/>"
   },
   {
    "number": 44,
    "section": "nested blockquote and list",
    "markdown": "> - a\n>   > b\n> 1. c\n",
-   "html": "<blockquote>\n<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n</li>\n</ul>\n<ol>\n<li>c</li>\n</ol>\n</blockquote>"
+   "html": "<blockquote>\n<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n</li>\n</ul>\n<ol>\n<li>c</li>\n</ol>\n</blockquote>",
+   "html_sanitized": "<blockquote>\n<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n</li>\n</ul>\n<ol>\n<li>c</li>\n</ol>\n</blockquote>"
   },
   {
    "number": 45,
    "section": "code: info string with meta",
    "markdown": "```js title=\"x.js\" {1,2}\nlet a = 1;\n```\n\n~~~\ntilde\n~~~\n\n    indented\n",
-   "html": "<pre><code class=\"language-js\">let a = 1;\n</code></pre>\n<pre><code>tilde\n</code></pre>\n<pre><code>indented\n</code></pre>"
+   "html": "<pre><code class=\"language-js\">let a = 1;\n</code></pre>\n<pre><code>tilde\n</code></pre>\n<pre><code>indented\n</code></pre>",
+   "html_sanitized": "<pre><code class=\"language-js\">let a = 1;\n</code></pre>\n<pre><code>tilde\n</code></pre>\n<pre><code>indented\n</code></pre>"
   },
   {
    "number": 46,
    "section": "code: leading blank lines",
    "markdown": "```\n\n\nx\n```\n",
-   "html": "<pre><code>\nx\n</code></pre>"
+   "html": "<pre><code>\nx\n</code></pre>",
+   "html_sanitized": "<pre><code>\nx\n</code></pre>"
   },
   {
    "number": 47,
    "section": "ordered list: start and loose",
    "markdown": "3. a\n4. b\n\n   c\n",
-   "html": "<ol start=\"3\">\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n</ol>"
+   "html": "<ol start=\"3\">\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n</ol>",
+   "html_sanitized": "<ol start=\"3\">\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n</ol>"
   },
   {
    "number": 48,
    "section": "hard breaks",
    "markdown": "a  \nb\\\nc\n",
-   "html": "<p>a<br/>\nb<br/>\nc</p>"
+   "html": "<p>a<br/>\nb<br/>\nc</p>",
+   "html_sanitized": "<p>a<br/>\nb<br/>\nc</p>"
   },
   {
    "number": 49,
    "section": "images with titles",
    "markdown": "![alt *em*](/a.png \"Title\") ![](/b.png)\n",
-   "html": "<p><img src=\"/a.png\" alt=\"alt em\" title=\"Title\"/> <img src=\"/b.png\" alt=\"\"/></p>"
+   "html": "<p><img src=\"/a.png\" alt=\"alt em\" title=\"Title\"/> <img src=\"/b.png\" alt=\"\"/></p>",
+   "html_sanitized": "<p><img src=\"/a.png\" alt=\"alt em\" title=\"Title\"/> <img src=\"/b.png\" alt=\"\"/></p>"
   },
   {
    "number": 50,
    "section": "links: reference and title",
    "markdown": "[a][r] [b] [c](</u v> 'T')\n\n[r]: /r \"R\"\n[b]: /b\n",
-   "html": "<p><a href=\"/r\" title=\"R\">a</a> <a href=\"/b\">b</a> <a href=\"/u%20v\" title=\"T\">c</a></p>"
+   "html": "<p><a href=\"/r\" title=\"R\">a</a> <a href=\"/b\">b</a> <a href=\"/u%20v\" title=\"T\">c</a></p>",
+   "html_sanitized": "<p><a href=\"/r\" title=\"R\">a</a> <a href=\"/b\">b</a> <a href=\"/u%20v\" title=\"T\">c</a></p>"
   },
   {
    "number": 51,
    "section": "unicode text",
    "markdown": "Ünïcödé ✓ 中文 עברית 🎉\n",
-   "html": "<p>Ünïcödé ✓ 中文 עברית 🎉</p>"
+   "html": "<p>Ünïcödé ✓ 中文 עברית 🎉</p>",
+   "html_sanitized": "<p>Ünïcödé ✓ 中文 עברית 🎉</p>"
   },
   {
    "number": 52,
    "section": "task list: two spaces after the marker",
    "markdown": "- [x]  two\n- [ ]\ttab\n- [x] \n  continued\n",
-   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/>  two</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> tab</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> continued</li>\n</ul>"
+   "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/>  two</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> tab</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> continued</li>\n</ul>",
+   "html_sanitized": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/>  two</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\"/> tab</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled=\"\" checked=\"\"/> continued</li>\n</ul>"
+  },
+  {
+   "number": 53,
+   "section": "sanitize: styles, classes and data attributes",
+   "markdown": "<p class=\"lead\" style=\"color: red\" data-x=\"1\" title=\"t\">styled</p>\n\n<div class=\"note\" itemscope itemtype=\"https://schema.org/Thing\">div</div>\n",
+   "html": "<p class=\"lead\" style=\"color:red\" data-x=\"1\" title=\"t\">styled</p>\n<div class=\"note\" itemScope=\"\" itemType=\"https://schema.org/Thing\">div</div>",
+   "html_sanitized": "<p title=\"t\">styled</p>\n<div itemScope=\"\" itemType=\"https://schema.org/Thing\">div</div>"
+  },
+  {
+   "number": 54,
+   "section": "sanitize: event handlers and unsafe protocols",
+   "markdown": "<a href=\"javascript:alert(1)\" onclick=\"x()\">js</a> <a href=\"HTTP://EXAMPLE.COM\">upper</a> <img src=\"data:image/png;base64,AA\" alt=\"d\"> <img src=\"//cdn.example/x.png\" alt=\"rel\">\n",
+   "html": "<p><a href=\"\">js</a> <a href=\"HTTP://EXAMPLE.COM\">upper</a> <img alt=\"d\"/> <img src=\"//cdn.example/x.png\" alt=\"rel\"/></p>",
+   "html_sanitized": "<p><a>js</a> <a>upper</a> <img alt=\"d\"/> <img src=\"//cdn.example/x.png\" alt=\"rel\"/></p>"
+  },
+  {
+   "number": 55,
+   "section": "sanitize: script, style and iframe",
+   "markdown": "<script>alert(1)</script>\n\n<style>p { color: red }</style>\n\n<iframe src=\"https://x.com\"></iframe>\n\ntext\n",
+   "html": "<script>alert(1)</script>\n<style>p { color: red }</style>\n<iframe src=\"https://x.com\"></iframe>\n<p>text</p>",
+   "html_sanitized": "\np { color: red }\n\n<p>text</p>"
+  },
+  {
+   "number": 56,
+   "section": "sanitize: svg and math",
+   "markdown": "<svg width=\"10\" height=\"10\"><circle cx=\"5\" cy=\"5\" r=\"4\"/><text>svg text</text></svg> <math><mi>x</mi></math>\n",
+   "html": "<p><svg width=\"10\" height=\"10\"><circle cx=\"5\" cy=\"5\" r=\"4\"></circle><text>svg text</text></svg> <math><mi>x</mi></math></p>",
+   "html_sanitized": "<p>svg text x</p>"
+  },
+  {
+   "number": 57,
+   "section": "sanitize: inputs",
+   "markdown": "<input type=\"text\" value=\"v\"> <input type=\"checkbox\" checked> <input disabled=\"disabled\" type=\"CHECKBOX\">\n",
+   "html": "<p><input type=\"text\" value=\"v\"/> <input type=\"checkbox\" checked=\"\"/> <input disabled=\"\" type=\"CHECKBOX\"/></p>",
+   "html_sanitized": "<p><input disabled=\"\" type=\"checkbox\" value=\"v\"/> <input type=\"checkbox\" disabled=\"\" checked=\"\"/> <input disabled=\"\" type=\"checkbox\"/></p>"
+  },
+  {
+   "number": 58,
+   "section": "sanitize: table parts outside a table",
+   "markdown": "<div><tr><td>cell</td></tr></div>\n\n<table><tbody><tr><td>ok</td></tr></tbody></table>\n",
+   "html": "<div>cell</div>\n<table><tbody><tr><td>ok</td></tr></tbody></table>",
+   "html_sanitized": "<div>cell</div>\n<table><tbody><tr><td>ok</td></tr></tbody></table>"
+  },
+  {
+   "number": 59,
+   "section": "sanitize: ids, names and aria references",
+   "markdown": "<h3 id=\"install\">Install</h3>\n\n<a name=\"anchor\" aria-describedby=\"a  b\" aria-label=\"L\">x</a>\n\n<span id=\"5\" aria-labelledby=\"install\">s</span>\n",
+   "html": "<h3 id=\"install\">Install</h3>\n<p><a name=\"anchor\" aria-describedby=\"a b\" aria-label=\"L\">x</a></p>\n<p><span id=\"5\" aria-labelledby=\"install\">s</span></p>",
+   "html_sanitized": "<h3 id=\"user-content-install\">Install</h3>\n<p><a name=\"user-content-anchor\" aria-describedby=\"user-content-a user-content-b\" aria-label=\"L\">x</a></p>\n<p><span id=\"user-content-5\">s</span></p>"
+  },
+  {
+   "number": 60,
+   "section": "sanitize: class lists",
+   "markdown": "<ul class=\"contains-task-list extra\"><li class=\"task-list-item other\">x</li><li class=\"foo\">y</li></ul>\n\n<code class=\"language-js lang-x\">c</code> <code class=\"language-\">d</code> <h2 class=\"sr-only big\">h</h2>\n",
+   "html": "<ul class=\"contains-task-list extra\"><li class=\"task-list-item other\">x</li><li class=\"foo\">y</li></ul>\n<p><code class=\"language-js lang-x\">c</code> <code class=\"language-\">d</code> </p><h2 class=\"sr-only big\">h</h2><p></p>",
+   "html_sanitized": "<ul class=\"contains-task-list\"><li class=\"task-list-item\">x</li><li class=\"\">y</li></ul>\n<p><code class=\"language-js\">c</code> <code class=\"\">d</code> </p><h2 class=\"sr-only\">h</h2><p></p>"
+  },
+  {
+   "number": 61,
+   "section": "sanitize: allowed attributes everywhere",
+   "markdown": "<td align=\"center\">c</td>\n\n<table><tr><td colspan=\"2\" rowspan=\"1\" valign=\"top\" nowrap>v</td></tr></table>\n\n<ol start=\"3\" reversed><li value=\"7\">x</li></ol>\n\n<details open><summary aria-label=\"s\">S</summary>D</details>\n",
+   "html": "<td style=\"text-align:center\">c</td>\n<td colSpan=\"2\" rowSpan=\"1\" vAlign=\"top\">v</td>\n<ol start=\"3\" reversed=\"\"><li value=\"7\">x</li></ol>\n<details open=\"\"><summary aria-label=\"s\">S</summary>D</details>",
+   "html_sanitized": "c\nv\n<ol start=\"3\"><li value=\"7\">x</li></ol>\n<details open=\"\"><summary aria-label=\"s\">S</summary>D</details>"
+  },
+  {
+   "number": 62,
+   "section": "sanitize: cite and longdesc",
+   "markdown": "<blockquote cite=\"https://x.com/q\">q</blockquote> <q cite=\"ftp://x\">q</q> <del cite=\"/rel\">d</del> <img src=\"a.png\" longdesc=\"javascript:x\" alt=\"i\">\n",
+   "html": "<blockquote cite=\"https://x.com/q\">q</blockquote> <q cite=\"\">q</q> <del cite=\"/rel\">d</del> <img src=\"a.png\" longDesc=\"javascript:x\" alt=\"i\"/>",
+   "html_sanitized": "<blockquote cite=\"https://x.com/q\">q</blockquote> <q>q</q> <del cite=\"/rel\">d</del> <img src=\"a.png\" alt=\"i\"/>"
+  },
+  {
+   "number": 63,
+   "section": "sanitize: picture source and kbd",
+   "markdown": "<picture><source srcset=\"a.png 1x, b.png 2x\" media=\"(min-width: 600px)\"><img src=\"c.png\" alt=\"p\"></picture> <kbd>K</kbd> <ruby>漢<rp>(</rp><rt>kan</rt><rp>)</rp></ruby>\n",
+   "html": "<p><picture><source srcSet=\"a.png 1x, b.png 2x\" media=\"(min-width: 600px)\"/><img src=\"c.png\" alt=\"p\"/></picture> <kbd>K</kbd> <ruby>漢<rp>(</rp><rt>kan</rt><rp>)</rp></ruby></p>",
+   "html_sanitized": "<p><picture><source srcSet=\"a.png 1x, b.png 2x\" media=\"(min-width: 600px)\"/><img src=\"c.png\" alt=\"p\"/></picture> <kbd>K</kbd> <ruby>漢<rp>(</rp><rt>kan</rt><rp>)</rp></ruby></p>"
+  },
+  {
+   "number": 64,
+   "section": "sanitize: comments and unknown elements",
+   "markdown": "<!-- c --><custom-el foo=\"bar\">inner</custom-el><font color=\"red\">f</font><center>c</center>\n",
+   "html": "<custom-el foo=\"bar\">inner</custom-el><font color=\"red\">f</font><center>c</center>",
+   "html_sanitized": "innerfc"
   }
  ]
 }

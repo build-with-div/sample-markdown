@@ -1,10 +1,11 @@
 //! The port against the npm packages' own output.
 //!
 //! - Every fixture's tree equals the DOM of its reference page.
-//! - Over each corpus (the CommonMark spec's examples and the GFM cases in
-//!   `fixtures/gfm-cases.json`), exactly the examples listed in
-//!   `<corpus>-known-differences.txt` differ. A fix must remove its number
-//!   from the list, and a regression fails.
+//! - Over each corpus (the fixtures, the CommonMark spec's examples and the
+//!   GFM cases in `fixtures/gfm-cases.json`), without and with
+//!   rehype-sanitize, exactly the examples listed in
+//!   `<corpus>[-sanitized]-known-differences.txt` differ. A fix must remove
+//!   its number from the list, and a regression fails.
 //!
 //! Both inputs are built by `reference/build.mjs` from the pinned packages.
 
@@ -12,7 +13,7 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use markdown_tree::{parse, parse_html, to_html, Node};
+use markdown_tree::{parse, parse_html, parse_with, to_html, Node, Options};
 
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -84,17 +85,47 @@ fn fixtures_match_the_reference_pages() {
 
 #[test]
 fn commonmark_corpus_differs_only_where_listed() {
-    check_corpus("commonmark", 10_000);
+    check_corpus("commonmark", false, 10_000);
 }
 
 #[test]
 fn gfm_corpus_differs_only_where_listed() {
-    check_corpus("gfm", 1_000);
+    check_corpus("gfm", false, 1_000);
 }
 
-fn check_corpus(name: &str, minimum_text: usize) {
-    let corpus: serde_json::Value =
-        serde_json::from_str(&read(&root().join(format!("reference/corpus/{name}.json")))).unwrap();
+#[test]
+fn fixtures_corpus_differs_only_where_listed() {
+    check_corpus("fixtures", false, 1_000);
+}
+
+#[test]
+fn sanitized_commonmark_corpus_differs_only_where_listed() {
+    check_corpus("commonmark", true, 10_000);
+}
+
+#[test]
+fn sanitized_gfm_corpus_differs_only_where_listed() {
+    check_corpus("gfm", true, 1_000);
+}
+
+#[test]
+fn sanitized_fixtures_corpus_differs_only_where_listed() {
+    check_corpus("fixtures", true, 1_000);
+}
+
+/// Checks one corpus against react-markdown's output, without or with
+/// rehype-sanitize (`html` or `html_sanitized`).
+fn check_corpus(corpus_name: &str, sanitize: bool, minimum_text: usize) {
+    let corpus: serde_json::Value = serde_json::from_str(&read(
+        &root().join(format!("reference/corpus/{corpus_name}.json")),
+    ))
+    .unwrap();
+    let (name, key) = if sanitize {
+        (format!("{corpus_name}-sanitized"), "html_sanitized")
+    } else {
+        (corpus_name.to_owned(), "html")
+    };
+    let options = Options { sanitize };
     let list =
         Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("tests/{name}-known-differences.txt"));
     let known: BTreeSet<u64> = read(&list)
@@ -108,11 +139,11 @@ fn check_corpus(name: &str, minimum_text: usize) {
     for example in examples {
         let number = example["number"].as_u64().unwrap();
         let markdown = example["markdown"].as_str().unwrap();
-        let Some(html) = example["html"].as_str() else {
-            continue;
-        };
+        let html = example[key]
+            .as_str()
+            .unwrap_or_else(|| panic!("{name} #{number}: the reference failed to render"));
         let expected = parse_html(html);
-        let actual = parse(markdown);
+        let actual = parse_with(markdown, options);
         total_text += text_length(&expected);
         if actual != expected {
             differ.insert(number);
@@ -138,7 +169,7 @@ fn check_corpus(name: &str, minimum_text: usize) {
     );
     assert!(
         report.is_empty() && fixed.is_empty(),
-        "{} unexpected differences, {} listed examples now equal ({fixed:?}):\n{}",
+        "{name}: {} unexpected differences, {} listed examples now equal ({fixed:?}):\n{}",
         report.len(),
         fixed.len(),
         report.join("\n")

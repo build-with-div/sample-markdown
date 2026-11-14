@@ -1,0 +1,3 @@
+# Examples of reference/corpus/gfm.json whose tree differs from react-markdown's
+# output with rehype-sanitize. One number per line, then the reason.
+15  # strikethrough pairing: micromark closes ~~a ~b~~ around the inner ~, comrak keeps the text

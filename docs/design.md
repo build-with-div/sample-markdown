@@ -259,7 +259,7 @@ The sample ports the packages. It does not stand in for the platform:
 | --- | --- | --- | --- |
 | P2-0 | Pin Div `main` (92ea25a0), reseed the lock, rerun the yardstick | – | reference pages, both modes |
 | P2-1 | `markdown-tree` crate: Markdown source → the DOM Chromium builds for react-markdown with remark-gfm and rehype-raw (tags, attributes, classes, text, in order). Done: [result](#p2-1-result) | react-markdown, remark-gfm, rehype-raw | Tree equality with `reference/pages` per fixture, and with the CommonMark and GFM corpora |
-| P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
+| P2-1b | rehype-sanitize with its default (GitHub) schema, as an option, for untrusted Markdown. Done: `parse_with(…, Options { sanitize: true })`, measured in the [P2-1 result](#p2-1-result) | rehype-sanitize | Tree equality with the same pipeline plus rehype-sanitize |
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: syntect with Shiki's TextMate grammars and themes, producing Shiki's token spans | Shiki | Token and color equality with Shiki's output; pixels of colored code blocks in computed mode |
@@ -287,11 +287,16 @@ depends on Div.
 Measured by `cargo test -p markdown-tree`, against outputs
 `reference/build.mjs` writes from the pinned npm packages:
 
-| Input | Trees equal | Listed differences |
-| --- | --- | --- |
-| Fixtures (`reference/pages`) | 12/12 | none |
-| CommonMark 0.31.2 spec examples (`reference/corpus/commonmark.json`) | 651/652 | #606: remark-gfm links an email autolink literal after `\+`, comrak does not |
-| GFM cases (`fixtures/gfm-cases.json`, `reference/corpus/gfm.json`) | 51/52 | #15: micromark closes `~~a ~b~~` as strikethrough, comrak keeps the text |
+| Input | Trees equal | With rehype-sanitize | Listed differences |
+| --- | --- | --- | --- |
+| Fixtures (`reference/pages`, `reference/corpus/fixtures.json`) | 12/12 | 12/12 | none |
+| CommonMark 0.31.2 spec examples (`reference/corpus/commonmark.json`) | 651/652 | 651/652 | #606: remark-gfm links an email autolink literal after `\+`, comrak does not |
+| GFM cases (`fixtures/gfm-cases.json`, `reference/corpus/gfm.json`) | 63/64 | 63/64 | #15: micromark closes `~~a ~b~~` as strikethrough, comrak keeps the text |
+
+The GFM cases include 12 aimed at the sanitizer: styles, classes, data and
+event attributes, unsafe and upper-case protocols, `script`, `style`,
+`iframe`, SVG and MathML, inputs, table parts outside a table, `id`, `name`
+and aria references, and class lists.
 
 "Equal" means the same elements, namespaces, attributes (names, values,
 order) and text as html5ever's parse of React's markup for that input. The
@@ -311,6 +316,19 @@ Behavior ported along the way, each covered by the corpora:
 - Table cells' `align` becomes `style="text-align:…"`, after any existing
   declarations.
 - Whitespace text inside table rows and sections is dropped.
+- rehype-sanitize details:
+  - Disallowed elements are replaced by their content, except `script`,
+    which goes with its content.
+  - An allow-listed class attribute keeps only its allowed tokens, and
+    writes `class=""` when none is left.
+  - Protocols are matched case-sensitively, so `HTTP://` links lose their
+    `href`.
+  - `<input>` gets `disabled` and `type="checkbox"` appended.
+  - `id`, `name` and `aria-describedby`/`aria-labelledby` get the
+    `user-content-` prefix. That includes the footnote ids remark-rehype
+    has already prefixed, so in this pipeline footnote links no longer
+    reach their targets. The port keeps that, since it is what the
+    packages do.
 
 Not ported and not measured:
 - React 19 hoists `<title>`, `<meta>` and `<link>` to the start of its
