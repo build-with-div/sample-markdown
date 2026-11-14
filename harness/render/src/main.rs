@@ -31,7 +31,6 @@ use div::{
 };
 use markdown_tree::Node;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
@@ -376,27 +375,7 @@ fn build_from_source(
     let Node::Element(body_node) = &body else {
         unreachable!("page_body returns an element")
     };
-    let base = source.parent().unwrap_or(Path::new(".")).to_owned();
-    let load = move |src: &str| -> Option<markdown_div::Image> {
-        let mime_type = match Path::new(src).extension()?.to_str()? {
-            "png" => "image/png",
-            "jpg" | "jpeg" => "image/jpeg",
-            "gif" => "image/gif",
-            "svg" => "image/svg+xml",
-            "webp" => "image/webp",
-            _ => return None,
-        };
-        let bytes = std::fs::read(base.join(src)).ok()?;
-        let sha256 = Sha256::digest(&bytes)
-            .iter()
-            .map(|byte| format!("{byte:02x}"))
-            .collect();
-        Some(markdown_div::Image {
-            bytes,
-            mime_type: mime_type.to_owned(),
-            sha256,
-        })
-    };
+    let load = markdown_div::directory_loader(source.parent().unwrap_or(Path::new(".")).to_owned());
     // div-gap: G-ROOT. As in `build`, the page's `<body>` is a `div` inside
     // Div's root element.
     let body_element = Element::create(document, "div")?;

@@ -31,3 +31,10 @@ Checked against Div `565db46a`; the gaps are unchanged at `92ea25a0` (same measu
   public API.
 - **MD-14 Disclosure markers.** `disclosure-open` and `disclosure-closed`
   are rejected.
+- **MD-6 Theme.** The viewer's theme switch changes its own toolbar and the
+  article's `data-theme`, which nothing in Div reads. It cannot start in the
+  system's theme (`examples/viewer`, `Viewer::set_theme`).
+- **MD-17 Links.** Clicking a footnote reference does not scroll to the
+  footnote; links do nothing (`div_gap_md17_fragment_links_do_not_navigate`).
+- **MD-23 Keyboard scrolling.** No key scrolls the viewer's document,
+  focused or not (`div_gap_md23_keys_do_not_scroll`).

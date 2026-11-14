@@ -12,9 +12,11 @@
 //! [`Report`], never hidden.
 
 use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
 
 use div::{Document, Element, Error};
 use markdown_tree::{Namespace, Node};
+use sha2::{Digest, Sha256};
 
 /// An image's bytes, as an app would have fetched them for `<img src>`.
 pub struct Image {
@@ -27,6 +29,60 @@ pub struct Image {
 
 /// Fetches the image an `<img src>` names, if the app can.
 pub type ImageLoader<'a> = &'a dyn Fn(&str) -> Option<Image>;
+
+/// A loader for a document read from a directory: relative `src` values
+/// name files under `base`, with the MIME type a static file server gives
+/// their extension.
+///
+/// div-gap: G-IMG-SRC `<img src>` resolution and fetching (MD-15). A page
+/// resolves `src` against its base URL and fetches it; Div does neither, so
+/// the app does this much. URLs with a scheme or an absolute path load
+/// nothing here.
+pub fn directory_loader(base: PathBuf) -> impl Fn(&str) -> Option<Image> {
+    move |src: &str| {
+        let path = src.split(['?', '#']).next().unwrap_or("");
+        if path.is_empty() || path.starts_with('/') || path.contains(':') {
+            return None;
+        }
+        let path = percent_decode(path)?;
+        let mime_type = match Path::new(&path).extension()?.to_str()? {
+            "png" => "image/png",
+            "jpg" | "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
+            "svg" => "image/svg+xml",
+            "webp" => "image/webp",
+            _ => return None,
+        };
+        let bytes = std::fs::read(base.join(&path)).ok()?;
+        let sha256 = Sha256::digest(&bytes)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect();
+        Some(Image {
+            bytes,
+            mime_type: mime_type.to_owned(),
+            sha256,
+        })
+    }
+}
+
+/// `%XX` escapes to bytes, as a file URL's path becomes a file name.
+fn percent_decode(text: &str) -> Option<String> {
+    let bytes = text.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' {
+            let hex = text.get(i + 1..i + 3)?;
+            out.push(u8::from_str_radix(hex, 16).ok()?);
+            i += 3;
+        } else {
+            out.push(bytes[i]);
+            i += 1;
+        }
+    }
+    String::from_utf8(out).ok()
+}
 
 /// What mounting ran into.
 #[derive(Debug, Default, PartialEq, Eq)]

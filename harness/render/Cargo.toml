@@ -17,4 +17,3 @@ divui.workspace = true
 serde_json = { workspace = true, features = ["preserve_order"] }
 markdown-tree = { path = "../../crates/markdown-tree" }
 markdown-div = { path = "../../crates/markdown-div" }
-sha2.workspace = true
