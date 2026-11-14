@@ -1,0 +1,3 @@
+# Examples of reference/corpus/commonmark.json whose tree differs from react-markdown's
+# output with rehype-sanitize. One number per line, then the reason.
+606  # GFM autolink literal after a backslash escape: remark-gfm links foo+@bar.example.com, comrak keeps text

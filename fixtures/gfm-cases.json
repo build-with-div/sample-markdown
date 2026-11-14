@@ -50,5 +50,17 @@
   {"name": "images with titles", "markdown": "![alt *em*](/a.png \"Title\") ![](/b.png)\n"},
   {"name": "links: reference and title", "markdown": "[a][r] [b] [c](</u v> 'T')\n\n[r]: /r \"R\"\n[b]: /b\n"},
   {"name": "unicode text", "markdown": "Ünïcödé ✓ 中文 עברית 🎉\n"},
-  {"name": "task list: two spaces after the marker", "markdown": "- [x]  two\n- [ ]\ttab\n- [x] \n  continued\n"}
+  {"name": "task list: two spaces after the marker", "markdown": "- [x]  two\n- [ ]\ttab\n- [x] \n  continued\n"},
+  {"name": "sanitize: styles, classes and data attributes", "markdown": "<p class=\"lead\" style=\"color: red\" data-x=\"1\" title=\"t\">styled</p>\n\n<div class=\"note\" itemscope itemtype=\"https://schema.org/Thing\">div</div>\n"},
+  {"name": "sanitize: event handlers and unsafe protocols", "markdown": "<a href=\"javascript:alert(1)\" onclick=\"x()\">js</a> <a href=\"HTTP://EXAMPLE.COM\">upper</a> <img src=\"data:image/png;base64,AA\" alt=\"d\"> <img src=\"//cdn.example/x.png\" alt=\"rel\">\n"},
+  {"name": "sanitize: script, style and iframe", "markdown": "<script>alert(1)</script>\n\n<style>p { color: red }</style>\n\n<iframe src=\"https://x.com\"></iframe>\n\ntext\n"},
+  {"name": "sanitize: svg and math", "markdown": "<svg width=\"10\" height=\"10\"><circle cx=\"5\" cy=\"5\" r=\"4\"/><text>svg text</text></svg> <math><mi>x</mi></math>\n"},
+  {"name": "sanitize: inputs", "markdown": "<input type=\"text\" value=\"v\"> <input type=\"checkbox\" checked> <input disabled=\"disabled\" type=\"CHECKBOX\">\n"},
+  {"name": "sanitize: table parts outside a table", "markdown": "<div><tr><td>cell</td></tr></div>\n\n<table><tbody><tr><td>ok</td></tr></tbody></table>\n"},
+  {"name": "sanitize: ids, names and aria references", "markdown": "<h3 id=\"install\">Install</h3>\n\n<a name=\"anchor\" aria-describedby=\"a  b\" aria-label=\"L\">x</a>\n\n<span id=\"5\" aria-labelledby=\"install\">s</span>\n"},
+  {"name": "sanitize: class lists", "markdown": "<ul class=\"contains-task-list extra\"><li class=\"task-list-item other\">x</li><li class=\"foo\">y</li></ul>\n\n<code class=\"language-js lang-x\">c</code> <code class=\"language-\">d</code> <h2 class=\"sr-only big\">h</h2>\n"},
+  {"name": "sanitize: allowed attributes everywhere", "markdown": "<td align=\"center\">c</td>\n\n<table><tr><td colspan=\"2\" rowspan=\"1\" valign=\"top\" nowrap>v</td></tr></table>\n\n<ol start=\"3\" reversed><li value=\"7\">x</li></ol>\n\n<details open><summary aria-label=\"s\">S</summary>D</details>\n"},
+  {"name": "sanitize: cite and longdesc", "markdown": "<blockquote cite=\"https://x.com/q\">q</blockquote> <q cite=\"ftp://x\">q</q> <del cite=\"/rel\">d</del> <img src=\"a.png\" longdesc=\"javascript:x\" alt=\"i\">\n"},
+  {"name": "sanitize: picture source and kbd", "markdown": "<picture><source srcset=\"a.png 1x, b.png 2x\" media=\"(min-width: 600px)\"><img src=\"c.png\" alt=\"p\"></picture> <kbd>K</kbd> <ruby>漢<rp>(</rp><rt>kan</rt><rp>)</rp></ruby>\n"},
+  {"name": "sanitize: comments and unknown elements", "markdown": "<!-- c --><custom-el foo=\"bar\">inner</custom-el><font color=\"red\">f</font><center>c</center>\n"}
 ]

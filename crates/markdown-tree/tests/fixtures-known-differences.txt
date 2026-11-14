@@ -1,0 +1,2 @@
+# Examples of reference/corpus/fixtures.json whose tree differs from react-markdown's
+# output. One number per line, then the reason.
