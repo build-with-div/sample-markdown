@@ -8,6 +8,8 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
+# The element tree `codeToHast` builds, and the hook rehype runs it from.
+markdown-tree = { path = "../markdown-tree" }
 # Oniguruma, the regex engine vscode-oniguruma compiles to WebAssembly for
 # Shiki. Without `generate`, onig_sys uses its pregenerated bindings and
 # needs no libclang.

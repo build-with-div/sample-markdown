@@ -263,6 +263,29 @@ mod tests {
         );
     }
 
+    /// div-gap: MD-24. Div keeps a `style` attribute but does not apply its
+    /// declarations, so Shiki's colored spans show the inherited color.
+    /// Fails when Div applies inline styles.
+    #[test]
+    fn div_gap_md24_style_attribute_is_not_applied() {
+        let document = document();
+        let nodes = markdown_tree::parse("<span style=\"color:#ff0000\">a</span><span>b</span>\n");
+        let mounted = mount(&document, &document.body(), &nodes, None).unwrap();
+        let styled = &mounted.elements[1];
+        let plain = &mounted.elements[2];
+        assert_eq!(
+            styled.get_attribute("style").unwrap().as_deref(),
+            Some("color:#ff0000")
+        );
+        let color = |element: &Element| format!("{:?}", element.computed_style().unwrap().color);
+        assert_eq!(color(styled), color(plain));
+        // Control: the same declaration through the style API does apply.
+        let property = div::StyleProperty::from_css_name("color").unwrap();
+        let value = div::typed_style::parse_literal(property, "#ff0000").unwrap();
+        plain.set_property(property, value).unwrap();
+        assert_ne!(color(styled), color(plain));
+    }
+
     #[test]
     fn reports_images_it_could_not_load() {
         let document = document();

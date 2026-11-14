@@ -170,9 +170,10 @@ read from Div's source.
 | MD-17 | links → navigation | Read: `a` is a plain `Span`: no focus, activation, cursor or `href` handling; no API to open a URL externally. Measured in the viewer: a click on `<a href="#user-content-fn-1">` leaves the document at scroll position 0 with the footnote 1,188 px down | `a[href]` semantics, a navigation callback, fragment scroll and `:target`, `open_url` on Windows and Linux | framework + platform + engine | M |
 | MD-18 | GitHub raw HTML → presentational attributes | Read: none | `align` on `p`/`div`/`img`/headings, `width`/`height` on `img` (GitHub strips `style`, so no runtime CSS is needed for parity) | engine (UA preset) | S |
 | MD-19 | the component | – | A `div-markdown` crate: comrak → real elements → `github-markdown-css` compiled by `stylesheet!` ([API](#recommended-component-api)) | components | M (after MD-1, 3, 4) |
-| MD-20 | Shiki → highlighting | Read: colored spans work today (inline `color`). Measured (P2-4): the port's tokens and colors equal Shiki's | Nothing in Div for single themes. Shiki's dual themes need MD-5 and MD-6 | components (a port of Shiki, as in `markdown-highlight`) | S |
+| MD-20 | Shiki → highlighting | Measured (P2-4): the port's tokens and colors equal Shiki's. Measured (P2-4b): the port's highlighted blocks equal `@shikijs/rehype`'s in all 24 pages; their colors come in the `style` attribute, which Div does not apply (MD-24) | For single themes, only MD-24. Shiki's dual themes also need MD-5 and MD-6 | components (a port of Shiki, as in `markdown-highlight`) | S |
 | MD-21 | KaTeX (stretch) | Read: `register_font_face` exists; WOFF2 fails on Linux with the census FreeType (components track); SVG `path` fill not drawn | `@font-face` in sheets, WOFF2 decode on Linux, SVG paths (V1), exact inline-block baselines | engine | L |
 | MD-23 | all → keyboard scrolling | Measured in the viewer (headless dispatch, `Document::dispatch_key`): PageDown, ArrowDown, Space and End leave a scroll container at 0, after a click in it and when it has focus. Without `tabindex`, `focus()` on it fails (`NotFocusable`). Read: no key in div-engine or divui has a scrolling default action. The wheel scrolls it (120 px per notch) | Keyboard scrolling of the focused or last-clicked scroller, and of the viewport: arrows, Page Up/Down, Space/Shift+Space, Home/End, as Chromium does. Scrollers without focusable content are keyboard-focusable, as in Chromium since 130 | engine (default actions) + framework (key routing) | M |
+| MD-24 | Shiki, rehype-raw → inline `style` attribute | Measured (P2-4b, `div_gap_md24_style_attribute_is_not_applied`): `set_attribute("style", "color:#ff0000")` keeps the attribute, and the element's computed `color` stays the inherited one. The same declaration through `set_property` applies. So Shiki's token colors and its `pre` background and color, and raw HTML's `style`, show nothing | The `style` attribute parsed as a declaration block into the element's inline style, which the cascade applies over author rules (`ElementCSSInlineStyle`) | engine (div-style inline declarations, div-engine attribute changes) | S/M |
 | MD-22 | Mermaid (stretch) | Div has no JavaScript by design | A Rust port of the layout (dagre) plus SVG text, strokes and markers (V1 stages); or pre-rendered SVG. Defer | components + engine | L |
 
 ## Recommended component API
@@ -206,8 +207,9 @@ view! {
 ## Fidelity plan
 
 1. The fixtures and harness here are a coverage suite for the engine track,
-   and computed mode is its layout, paint and text score. Today it is 214/392
-   boxes and 46/92 blocks at 1x. Each fix in MD-7 to MD-14 should move
+   and computed mode is its layout, paint and text score. Today it is 222/428
+   boxes and 47/92 blocks at 1x (since P2-4b, when the pages started
+   highlighting code; 214/392 and 46/92 before). Each fix in MD-7 to MD-14 should move
    named rows in [fidelity-results.md](fidelity-results.md); the parent
    session can re-run `compare.py` against any Div commit.
 2. When A1's `stylesheet!` lands, add a **stylesheet mode**: real classes and
@@ -256,8 +258,9 @@ The sample ports the packages. It does not stand in for the platform:
   `// div-gap: <id> <web feature>` and listed in
   [framework-gaps.md](framework-gaps.md).
 - **The yardstick moves with the pin.** It is the reference-pages
-  comparison (semantic 0/392 boxes, computed 214/392 at `565db46a`), rerun
-  whenever the pin moves.
+  comparison (semantic 0/392 boxes, computed 214/392 at `565db46a`;
+  0/428 and 222/428 since the pages highlight code, P2-4b), rerun whenever
+  the pin moves.
 
 | # | Milestone | Ports | Measured by |
 | --- | --- | --- | --- |
@@ -267,7 +270,8 @@ The sample ports the packages. It does not stand in for the platform:
 | P2-2 | Mount that tree in a Div document through the public API. The harness's semantic mode starts from Markdown source, not a captured tree. Done: [result](#p2-2-result) | – | Yardstick semantic mode, rendered from source |
 | P2-3 | Viewer example: open a `.md` file, scroll, light/dark, links, images. Missing APIs are labeled gaps (MD-6, MD-15, MD-17). Done: [result](#p2-3-result) | – | Screenshots; interaction traces where Div's test input helpers allow |
 | P2-4 | Highlighting: Shiki's tokenizer (`@shikijs/vscode-textmate`) ported to Rust on Oniguruma, with Shiki's grammars and themes, producing Shiki's tokens. Planned on syntect; changed, for the reasons in the result. Done: [result](#p2-4-result) | Shiki | Token and color equality with Shiki's output |
-| P2-4b | Highlighted code blocks: Shiki's spans in the reference pages, and the port's spans mounted in Div | Shiki | Pixels of colored code blocks in computed mode |
+| P2-4b | Highlighted code blocks: Shiki's spans in the reference pages, and the port's spans mounted in Div. Done: [result](#p2-4b-result) | Shiki (`@shikijs/rehype`) | Pixels of colored code blocks in computed mode |
+| P2-4c | The viewer highlights code blocks, with the Shiki theme following its theme switch | Shiki | Viewer tests |
 | P2-5 | When S5, S6 and A1 land: stylesheet mode (github-markdown-css through `stylesheet!` in its browser-compatible ingestion mode, with the dropped-rule report checked in), semantic mode with the browser preset, and removal of the scaffolding they replace | github-markdown-css | Yardstick, all three modes |
 | P2-6 (stretch) | KaTeX's HTML output, after MD-21 | KaTeX | Reference pages with math |
 
@@ -463,11 +467,80 @@ Shiki's own algorithm on Oniguruma, the engine Shiki uses.
 speed, so a line where Shiki stops early may differ. The Oniguruma version
 inside Shiki's `onig.wasm` was not identified; the port uses 6.9.10.
 
-**Not done here (P2-4b).** Highlighted code blocks in the reference pages
+**Not done here ([P2-4b](#p2-4b-result)).** Highlighted code blocks in the reference pages
 and in Div were not measured. The pages, the harness and the pin did not
 change, so the yardstick was not rerun. Div gaps: none new. MD-20 is
 unchanged: inline `color` is all a single theme needs, and Shiki's dual
 themes need MD-5 and MD-6.
+
+### P2-4b result
+
+The reference pages now highlight code as an app using `@shikijs/rehype`
+does: `reference/build.mjs` adds `rehypeShikiFromHighlighter` (its core,
+default options) after rehype-raw, with the Shiki theme of the page's theme
+(github-light, github-dark). Only `code` and `readme` changed: their
+`rust` and `sh` blocks. Blocks without a language, or in a language not
+loaded, stay as they were, as in Shiki.
+
+The port:
+- **`markdown-tree`:** `Options::highlight` takes a `Highlight` and runs
+  `@shikijs/rehype`'s `PreHandler` on the tree. A `pre` whose first child
+  is a `code` with a `language-…` class in a loaded language (or a plain
+  language, or `ansi`) is replaced with the highlighter's nodes, which
+  then take React's attribute rules.
+- **`markdown-highlight`:** `Highlighter::code_to_hast` ports
+  `@shikijs/core`'s `codeToHast` for one theme with default options (the
+  classic `pre.shiki` > `code` > `span.line` structure, `tabindex="0"`,
+  `mergeWhitespaceTokens`, token styles in Shiki's order). `RehypeShiki`
+  is the `Highlight`. Not ported: the `ansi` language
+  (`tokenizeAnsiWithTheme`); such a block stays unhighlighted.
+- **Harness:** `markdown-render --source F.md --highlight THEME`, with the
+  theme from the pages' manifest.
+
+Tree equality, measured by `cargo test` on Windows (`tests/rehype.rs` in
+`markdown-highlight`). The corpus `reference/corpus/rehype-shiki.json` is
+the fixtures, the 15 Shiki cases as fenced blocks, the CommonMark spec's
+examples and the GFM cases, rendered by the packages:
+
+| Input | Equal to the packages | Listed differences |
+| --- | --- | --- |
+| The 24 reference pages, each with its theme | 24/24 (4 highlighted blocks) | none |
+| `rehype-shiki.json`, github-light / github-dark / github-light after rehype-sanitize | 741/743 each (18 highlighted blocks each) | #633 and #694, CommonMark 606 and GFM case 15, the Markdown parser differences already listed for `markdown-tree`; neither has a code block |
+| The harness, `report --source --highlight` | 24/24 trees equal the captured DOM | none |
+
+Pixels, from the yardstick run below (Div `92ea25a0`, Chrome for Testing
+147.0.7727.50 in WSL). Mismatched pixels of each highlighted block, at 1x
+and 2x:
+
+| Block | Computed 1x | Computed 2x | Semantic 1x | Semantic 2x |
+| --- | --- | --- | --- | --- |
+| `code-light`, `rust` | 87 (111 before) | 324 (398) | 14,593 (60,368) | 54,147 (241,468) |
+| `code-dark`, `rust` | 10,438 (10,438) | 41,730 (41,730) | 60,378 (60,378) | 241,512 (241,512) |
+| `readme-light`, `sh` | 0 (744) | 0 (1,538) | 2,488 (35,378) | 7,568 (141,487) |
+| `readme-dark`, `sh` | 750 (750) | 1,562 (1,562) | 36,782 (36,782) | 144,352 (144,352) |
+
+"Before" is the previous run, against the unhighlighted pages. Read by
+row at 1x:
+- **Computed mode:** every row of highlighted text is exact in all four
+  blocks: the copied colors draw as Chromium draws them. What differs is
+  the rounded corners of the dark blocks (MD-10), one row at the bottom of
+  the `readme-dark` block (lines are 1/64 px taller, MD-12), and in `code`
+  the 15-px band where the horizontal scrollbar is (87 px light, 10,410 px
+  dark, which is unchanged). The light blocks improved because Shiki's
+  `#fff` background hides the corners on a white page.
+- **Semantic mode:** at 1x, Div's render of all four pages is
+  pixel-identical to the previous run. At 2x, `readme` is identical and
+  `code` differs in one line (`let value = compute(1, 2, 3);`; 682 px in
+  light, 682 px in dark): glyphs moved by subpixels where the text is now
+  split across Shiki's spans. Nothing is colored. The port mounts Shiki's
+  spans (the trees equal the capture), but their colors are in `style`
+  attributes, which Div does not apply: MD-24, new,
+  `div_gap_md24_style_attribute_is_not_applied`. The light counts fell
+  because the reference's block background became white, like Div's
+  unstyled page. Not worked around.
+
+Gaps: MD-24 is new (engine, S/M). MD-20 now needs only MD-24 for single
+themes. Not done here: the viewer (P2-4c).
 
 ### Yardstick history
 
@@ -481,6 +554,7 @@ added the row.
 | `565db46a` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | phase 1 baseline |
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | none: every measured value equal (the two new commits are framework-only `{expr}` view children) |
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | P2-2: semantic mode from Markdown source (24/24 trees equal the capture). Pixels changed only on the two image pages (300×150 images, G-IMG-SIZE) |
+| `92ea25a0` | 0/48 / 0/428 | 8/48 / 222/428 | 47/92 / 35/92 | P2-4b: the reference changed, as the pages highlight code with `@shikijs/rehype`. 36 new boxes on the 4 `code` and `readme` pages (Shiki's spans); 8 of them exact in computed mode, all 4 `readme` spans in each theme. The `readme-light` code block became exact at 1x and 2x. The other 20 pages: every value equal ([P2-4b](#p2-4b-result)) |
 
 ## CSS inventory
 

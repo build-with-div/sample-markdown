@@ -1,0 +1,5 @@
+# Examples of reference/corpus/rehype-shiki.json whose tree differs from
+# react-markdown with @shikijs/rehype (tests/rehype.rs). One number per
+# line, then the reason. None is in a highlighted block.
+633  # CommonMark 606, as in markdown-tree's commonmark list: remark-gfm links foo+@bar.example.com after a backslash escape, comrak keeps text
+694  # GFM case 15, as in markdown-tree's gfm list: micromark closes ~~a ~b~~ around the inner ~, comrak keeps the text

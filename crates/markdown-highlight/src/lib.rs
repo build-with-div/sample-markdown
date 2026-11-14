@@ -10,13 +10,16 @@
 //! Shiki's: `tests/shiki.rs` compares them with Shiki's output
 //! (`reference/corpus/shiki.json`).
 //!
-//! Nothing here depends on Div. Turning the tokens into styled elements in
-//! a Div document is a separate step.
+//! [`Highlighter::code_to_hast`] ports Shiki's `codeToHast`, and
+//! [`RehypeShiki`] is the highlighter `@shikijs/rehype` calls, for
+//! [`markdown_tree::parse_with`]. Nothing here depends on Div.
 
 mod data;
+mod hast;
 pub mod shiki;
 pub mod textmate;
 
+pub use hast::RehypeShiki;
 pub use shiki::{normalize_theme, Error, Highlighter, NormalizedTheme, ThemedToken};
 
 /// The bundled languages, in Shiki's load order, and themes.

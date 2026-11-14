@@ -25,6 +25,8 @@ pub enum Error {
     UnknownTheme(String),
     /// A grammar pattern Oniguruma rejects.
     Regex(ScannerError),
+    /// A part of Shiki this port does not have.
+    NotPorted(&'static str),
 }
 
 impl fmt::Display for Error {
@@ -33,6 +35,7 @@ impl fmt::Display for Error {
             Self::UnknownLanguage(name) => write!(f, "Language `{name}` not found"),
             Self::UnknownTheme(name) => write!(f, "Theme `{name}` not found"),
             Self::Regex(error) => error.fmt(f),
+            Self::NotPorted(what) => write!(f, "{what} is not ported"),
         }
     }
 }
@@ -176,6 +179,14 @@ impl NormalizedTheme {
     pub fn settings(&self) -> &[Value] {
         &self.settings
     }
+
+    /// `applyColorReplacements` with the theme's replacements.
+    pub fn replace_color(&self, color: &str) -> String {
+        self.color_replacements
+            .get(&color.to_lowercase())
+            .cloned()
+            .unwrap_or_else(|| color.to_owned())
+    }
 }
 
 /// A loaded language: `LanguageRegistration` and its grammar.
@@ -185,7 +196,7 @@ struct Language {
 }
 
 /// `isPlainLang`.
-fn is_plain_lang(lang: &str) -> bool {
+pub(crate) fn is_plain_lang(lang: &str) -> bool {
     matches!(lang, "" | "plaintext" | "txt" | "text" | "plain")
 }
 
@@ -302,6 +313,12 @@ impl Highlighter {
 
     pub fn theme(&self, name: &str) -> Option<&NormalizedTheme> {
         self.themes.iter().find(|theme| theme.name == name)
+    }
+
+    /// Whether `getLoadedLanguages()` lists `name`: a language's name or
+    /// one of its aliases.
+    pub(crate) fn is_loaded(&self, name: &str) -> bool {
+        self.languages.contains_key(name) || self.aliases.contains_key(name)
     }
 
     /// `resolveLangAlias` over the languages' aliases.

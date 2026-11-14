@@ -7,7 +7,9 @@
     "rehype-sanitize": "6.0.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "github-markdown-css": "5.9.0"
+    "github-markdown-css": "5.9.0",
+    "@shikijs/rehype": "4.6.0",
+    "shiki": "4.6.0"
   },
   "fixtures": [
     {
@@ -15,6 +17,7 @@
       "source": "fixtures/blockquote.md",
       "source_sha256": "4ae169571ecb2f680db2e87fde1624f3cdf641dbdc4b29514919cdd1c98e9e58",
       "theme": "light",
+      "highlight": "github-light",
       "page": "blockquote-light.html"
     },
     {
@@ -22,6 +25,7 @@
       "source": "fixtures/blockquote.md",
       "source_sha256": "4ae169571ecb2f680db2e87fde1624f3cdf641dbdc4b29514919cdd1c98e9e58",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "blockquote-dark.html"
     },
     {
@@ -29,6 +33,7 @@
       "source": "fixtures/code.md",
       "source_sha256": "7736cd67c9a10a07ca0df63eac4f05caa046c966127f03babfb019d0478118b8",
       "theme": "light",
+      "highlight": "github-light",
       "page": "code-light.html"
     },
     {
@@ -36,6 +41,7 @@
       "source": "fixtures/code.md",
       "source_sha256": "7736cd67c9a10a07ca0df63eac4f05caa046c966127f03babfb019d0478118b8",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "code-dark.html"
     },
     {
@@ -43,6 +49,7 @@
       "source": "fixtures/footnotes.md",
       "source_sha256": "6b76d90c5474352fd8362ffbbceac8e45364baa7fec46fc0661a05906b6f6723",
       "theme": "light",
+      "highlight": "github-light",
       "page": "footnotes-light.html"
     },
     {
@@ -50,6 +57,7 @@
       "source": "fixtures/footnotes.md",
       "source_sha256": "6b76d90c5474352fd8362ffbbceac8e45364baa7fec46fc0661a05906b6f6723",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "footnotes-dark.html"
     },
     {
@@ -57,6 +65,7 @@
       "source": "fixtures/headings.md",
       "source_sha256": "4fcd3efcd84970b7e9b75ef9a3a6cd7d949a163f378f1af70ca9dbb02be11349",
       "theme": "light",
+      "highlight": "github-light",
       "page": "headings-light.html"
     },
     {
@@ -64,6 +73,7 @@
       "source": "fixtures/headings.md",
       "source_sha256": "4fcd3efcd84970b7e9b75ef9a3a6cd7d949a163f378f1af70ca9dbb02be11349",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "headings-dark.html"
     },
     {
@@ -71,6 +81,7 @@
       "source": "fixtures/hr.md",
       "source_sha256": "2e2ebb523275113600ba8853b8179e02817638745a2e6e31acfb71aeb1b07777",
       "theme": "light",
+      "highlight": "github-light",
       "page": "hr-light.html"
     },
     {
@@ -78,6 +89,7 @@
       "source": "fixtures/hr.md",
       "source_sha256": "2e2ebb523275113600ba8853b8179e02817638745a2e6e31acfb71aeb1b07777",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "hr-dark.html"
     },
     {
@@ -85,6 +97,7 @@
       "source": "fixtures/html.md",
       "source_sha256": "154f04c9fa63034c01f8545513ea08ac56b4df3eeaaca7638a83fc2aac58b050",
       "theme": "light",
+      "highlight": "github-light",
       "page": "html-light.html"
     },
     {
@@ -92,6 +105,7 @@
       "source": "fixtures/html.md",
       "source_sha256": "154f04c9fa63034c01f8545513ea08ac56b4df3eeaaca7638a83fc2aac58b050",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "html-dark.html"
     },
     {
@@ -99,6 +113,7 @@
       "source": "fixtures/image.md",
       "source_sha256": "2b0e5e11ee00b082d84c9b73b1ec13388f12c3fd9f60ade295c234e458c8f865",
       "theme": "light",
+      "highlight": "github-light",
       "page": "image-light.html"
     },
     {
@@ -106,6 +121,7 @@
       "source": "fixtures/image.md",
       "source_sha256": "2b0e5e11ee00b082d84c9b73b1ec13388f12c3fd9f60ade295c234e458c8f865",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "image-dark.html"
     },
     {
@@ -113,6 +129,7 @@
       "source": "fixtures/inline.md",
       "source_sha256": "4c598615b89d3de16bb40001fee2cf8b1ac1b95ec746c067ac4d1cf936a8f58d",
       "theme": "light",
+      "highlight": "github-light",
       "page": "inline-light.html"
     },
     {
@@ -120,6 +137,7 @@
       "source": "fixtures/inline.md",
       "source_sha256": "4c598615b89d3de16bb40001fee2cf8b1ac1b95ec746c067ac4d1cf936a8f58d",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "inline-dark.html"
     },
     {
@@ -127,6 +145,7 @@
       "source": "fixtures/lists.md",
       "source_sha256": "de2407c1c799998dfa5c5a3bc4a314c7a5fad822bb435a92eaea49238bdafcfd",
       "theme": "light",
+      "highlight": "github-light",
       "page": "lists-light.html"
     },
     {
@@ -134,6 +153,7 @@
       "source": "fixtures/lists.md",
       "source_sha256": "de2407c1c799998dfa5c5a3bc4a314c7a5fad822bb435a92eaea49238bdafcfd",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "lists-dark.html"
     },
     {
@@ -141,6 +161,7 @@
       "source": "fixtures/readme.md",
       "source_sha256": "0ebf943bb205841659ddddbb82c48c135a74270e259ab0d1886bb13355c5c3f4",
       "theme": "light",
+      "highlight": "github-light",
       "page": "readme-light.html"
     },
     {
@@ -148,6 +169,7 @@
       "source": "fixtures/readme.md",
       "source_sha256": "0ebf943bb205841659ddddbb82c48c135a74270e259ab0d1886bb13355c5c3f4",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "readme-dark.html"
     },
     {
@@ -155,6 +177,7 @@
       "source": "fixtures/table.md",
       "source_sha256": "51438d52f821e1a9053a29a81976edb307cab5c91f0b541b9b426e84db7567e9",
       "theme": "light",
+      "highlight": "github-light",
       "page": "table-light.html"
     },
     {
@@ -162,6 +185,7 @@
       "source": "fixtures/table.md",
       "source_sha256": "51438d52f821e1a9053a29a81976edb307cab5c91f0b541b9b426e84db7567e9",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "table-dark.html"
     },
     {
@@ -169,6 +193,7 @@
       "source": "fixtures/tasklist.md",
       "source_sha256": "6bd9a7814b2401f2f209b9711a4b2c27b87ff50082a3501bf12a97f7487f4fb8",
       "theme": "light",
+      "highlight": "github-light",
       "page": "tasklist-light.html"
     },
     {
@@ -176,6 +201,7 @@
       "source": "fixtures/tasklist.md",
       "source_sha256": "6bd9a7814b2401f2f209b9711a4b2c27b87ff50082a3501bf12a97f7487f4fb8",
       "theme": "dark",
+      "highlight": "github-dark",
       "page": "tasklist-dark.html"
     }
   ]
