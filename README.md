@@ -11,7 +11,8 @@ code, KaTeX for math and Mermaid for diagrams. Div should render that HTML
 and CSS the way Chromium does, so a Markdown view is a port of those
 packages rather than a re-creation of their look.
 
-Status: phase 1, investigation. No viewer app yet. See
+Status: phase 2. `crates/markdown-tree` ports react-markdown with
+remark-gfm and rehype-raw to Rust. No viewer app yet. See
 [docs/design.md](docs/design.md) for the findings and plan, and
 [docs/rfc-markdown.md](docs/rfc-markdown.md) for the Div APIs it proposes.
 
@@ -20,7 +21,10 @@ Status: phase 1, investigation. No viewer app yet. See
 | Path | What |
 | --- | --- |
 | `fixtures/*.md` | Small GFM documents, one feature each, plus a README-like page |
+| `fixtures/gfm-cases.json` | Short GFM and raw-HTML cases for the tree test |
 | `reference/` | `build.mjs` turns each fixture into a Chromium reference page (react-markdown, remark-gfm, rehype-raw, github-markdown-css), light and dark; the pages are committed |
+| `reference/corpus/` | The CommonMark spec's examples and the GFM cases rendered by the same packages |
+| `crates/markdown-tree` | The port: Markdown to the DOM Chromium builds for react-markdown, checked against `reference/` |
 | `harness/render` | `markdown-render`: rebuilds a captured page tree with Div's public API and renders it |
 | `harness/compare.py` | Captures each page in pinned Chromium, renders it with Div, compares pixels and element boxes |
 | `harness/css_inventory.py` | Lists the selectors, at-rules, properties and functions a stylesheet uses |

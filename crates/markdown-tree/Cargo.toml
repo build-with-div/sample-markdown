@@ -1,0 +1,16 @@
+[package]
+name = "markdown-tree"
+description = "Markdown to the element tree react-markdown, remark-gfm and rehype-raw build"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+comrak.workspace = true
+html5ever.workspace = true
+markup5ever_rcdom.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
