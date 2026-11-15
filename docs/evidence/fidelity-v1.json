@@ -1,7 +1,7 @@
 {
  "schema": "sample-markdown-fidelity-v1",
  "chromium": "147.0.7727.50",
- "div_commit": "92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f",
+ "div_commit": "d0d7f376e8230117178275814aaf0b6b8fde7b89",
  "reference_versions": {
   "react-markdown": "10.1.0",
   "remark-gfm": "4.0.1",

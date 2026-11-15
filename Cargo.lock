@@ -436,7 +436,7 @@ checksum = "87a0cf66fd1eb2fb7b822cb78370d82303750809bc6ba855f3f58e517d3238db"
 [[package]]
 name = "bytemuck"
 version = "1.25.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "bytemuck_derive",
 ]
@@ -444,7 +444,7 @@ dependencies = [
 [[package]]
 name = "bytemuck_derive"
 version = "1.10.2"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -723,7 +723,7 @@ dependencies = [
 [[package]]
 name = "div-compositor"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-geometry",
  "div-layout",
@@ -734,7 +734,7 @@ dependencies = [
 [[package]]
 name = "div-dom"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-geometry",
  "div-style",
@@ -744,7 +744,7 @@ dependencies = [
 [[package]]
 name = "div-engine"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "accesskit",
  "div-compositor",
@@ -760,12 +760,12 @@ dependencies = [
 [[package]]
 name = "div-geometry"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 
 [[package]]
 name = "div-layout"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-dom",
  "div-geometry",
@@ -778,7 +778,7 @@ dependencies = [
 [[package]]
 name = "div-macros"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-style",
  "proc-macro2",
@@ -789,7 +789,7 @@ dependencies = [
 [[package]]
 name = "div-paint"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-dom",
  "div-geometry",
@@ -803,7 +803,7 @@ dependencies = [
 [[package]]
 name = "div-platform"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "accesskit",
  "accesskit_winit",
@@ -824,7 +824,7 @@ dependencies = [
 [[package]]
 name = "div-style"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-geometry",
  "div-style-derive",
@@ -835,7 +835,7 @@ dependencies = [
 [[package]]
 name = "div-style-derive"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -845,7 +845,7 @@ dependencies = [
 [[package]]
 name = "div-text"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "div-geometry",
  "div-style",
@@ -860,7 +860,7 @@ dependencies = [
 [[package]]
 name = "divui"
 version = "0.2.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "async-executor",
  "async-io",
@@ -1043,7 +1043,7 @@ checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 [[package]]
 name = "font-types"
 version = "0.11.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "bytemuck",
 ]
@@ -2218,7 +2218,7 @@ checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
 [[package]]
 name = "read-fonts"
 version = "0.37.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "bytemuck",
  "font-types",
@@ -2501,7 +2501,7 @@ dependencies = [
 [[package]]
 name = "skrifa"
 version = "0.40.0"
-source = "git+https://github.com/build-with-div/div?rev=92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f#92ea25a0756dd3e22aa57266ae5ead49a1ff9d8f"
+source = "git+https://github.com/build-with-div/div?rev=d0d7f376e8230117178275814aaf0b6b8fde7b89#d0d7f376e8230117178275814aaf0b6b8fde7b89"
 dependencies = [
  "bytemuck",
  "read-fonts",

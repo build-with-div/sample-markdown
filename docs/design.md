@@ -8,8 +8,9 @@ packages rely on, and we measure each one against pinned Chromium.
 This is the phase 1 report. Everything below was measured against Div
 `565db46a` (build-with-div/div `main`, 13 November 2026) and Chrome for
 Testing 147.0.7727.50 in WSL, or read from Div's source at that commit. A
-rerun at the current pin, `92ea25a0`, gave the same values for every fixture,
-box and block ([yardstick history](#yardstick-history)). Full
+rerun at `92ea25a0` gave the same values for every fixture, box and block,
+and so did one at the current pin, `d0d7f376`, after P2-4b changed the
+reference pages ([yardstick history](#yardstick-history)). Full
 numbers: [fidelity-results.md](fidelity-results.md), generated from
 [evidence/fidelity-v1.json](evidence/fidelity-v1.json). Proposed Div APIs:
 [rfc-markdown.md](rfc-markdown.md). Code-level `// div-gap:` labels:
@@ -578,6 +579,7 @@ added the row.
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | none: every measured value equal (the two new commits are framework-only `{expr}` view children) |
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | P2-2: semantic mode from Markdown source (24/24 trees equal the capture). Pixels changed only on the two image pages (300×150 images, G-IMG-SIZE) |
 | `92ea25a0` | 0/48 / 0/428 | 8/48 / 222/428 | 47/92 / 35/92 | P2-4b: the reference changed, as the pages highlight code with `@shikijs/rehype`. 36 new boxes on the 4 `code` and `readme` pages (Shiki's spans); 8 of them exact in computed mode, all 4 `readme` spans in each theme. The `readme-light` code block became exact at 1x and 2x. The other 20 pages: every value equal ([P2-4b](#p2-4b-result)) |
+| `d0d7f376` | 0/48 / 0/428 | 8/48 / 222/428 | 47/92 / 35/92 | none: every measured value equal to the P2-4b run (19 commits: docs, CI, tools, and one layout change, `78d771a1`, a flex column item's automatic minimum). The viewer, whose scroller is a flex column item, passes its 10 tests on Windows and Linux |
 
 ## CSS inventory
 

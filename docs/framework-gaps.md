@@ -5,7 +5,7 @@ point to the [gap inventory](design.md#gap-inventory), which has the
 evidence, owner and size. Every workaround below is temporary scaffolding,
 to be removed when Div fixes the gap. None is a technique for apps.
 
-Checked against Div `565db46a`; the gaps are unchanged at `92ea25a0` (same measured values).
+Checked against Div `565db46a`; the gaps are unchanged at `92ea25a0` and `d0d7f376` (same measured values). MD-24 was added at `92ea25a0`.
 
 | Label | Gap | Workaround here | Where | Inventory |
 | --- | --- | --- | --- | --- |
