@@ -22,6 +22,19 @@ SHOTS = ["readme-light", "readme-dark", "lists-light", "table-light", "code-ligh
 LOGICAL = ("-block-", "-inline-", "inline-size", "block-size")
 
 
+def device_scale_lines(results: dict) -> list[str]:
+    """How Chromium set each profile's device scale, when the results say."""
+    methods = results.get("chromium_device_scale")
+    if not methods:
+        return []
+    described = [
+        f"{scale} not emulated" if method == "none"
+        else f"{scale} at real zoom (`--force-device-scale-factor={scale[:-1]}`, RFC 0010)"
+        for scale, method in methods.items()
+    ]
+    return ["- Chromium device scale: " + ", ".join(described) + "."]
+
+
 def pct(exact: int, total: int) -> str:
     return f"{exact}/{total}" if total else "-"
 
@@ -152,6 +165,7 @@ def main() -> int:
         f"- Chromium {results['chromium']} (Chrome for Testing, Linux, census real-font fontconfig).",
         f"- Div {results['div_commit']}, `markdown-render`, raster configuration `chromium_linux_lcd`, pinned FreeType.",
         "- Reference: " + ", ".join(f"{k} {v}" for k, v in results["reference_versions"].items()) + ".",
+        *device_scale_lines(results),
         "- Semantic: the fixture's Markdown, parsed by `markdown-tree`, its code blocks "
         "highlighted by `markdown-highlight` with the page's Shiki theme, and mounted by "
         "`markdown-div` (tags, attributes and text only; images without an intrinsic size). "

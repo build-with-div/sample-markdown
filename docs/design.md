@@ -104,6 +104,13 @@ Commands and file layout are in the [README](../README.md#reproduce-the-comparis
    and for each top-level block of the article. Element boxes are compared
    within 1/128 px, Chromium's half LayoutUnit.
 
+   Since 16 November 2026 the 2x reference is Chromium at real zoom,
+   launched with `--force-device-scale-factor=2` as Div's oracles are
+   (RFC 0010, build-with-div/div#59); CDP sets only the viewport size.
+   Before that the harness emulated the device scale through CDP. 2x
+   numbers from before the [real-zoom baseline](#yardstick-history),
+   including those in this phase 1 report, are history.
+
 GitHub's font stack resolves through Fontconfig to DejaVu Sans and DejaVu
 Sans Mono in this environment, the same in Chromium and in Div (Div passes
 families to Fontconfig on Linux). Results are Linux only. On Windows, Div's
@@ -209,8 +216,8 @@ view! {
 
 1. The fixtures and harness here are a coverage suite for the engine track,
    and computed mode is its layout, paint and text score. Today it is 222/428
-   boxes and 47/92 blocks at 1x (since P2-4b, when the pages started
-   highlighting code; 214/392 and 46/92 before). Each fix in MD-7 to MD-14 should move
+   boxes, and 47/92 blocks at 1x and 12/92 at 2x with 2x at real zoom
+   ([history](#yardstick-history)). Each fix in MD-7 to MD-14 should move
    named rows in [fidelity-results.md](fidelity-results.md); the parent
    session can re-run `compare.py` against any Div commit.
 2. When A1's `stylesheet!` lands, add a **stylesheet mode**: real classes and
@@ -571,7 +578,8 @@ does not work around it.
 `harness/compare.py` over all 24 reference pages, Chrome for Testing
 147.0.7727.50 in WSL. Each row is a full run at that pin. Its
 `docs/evidence/fidelity-v1.json` is in the git history of the commit that
-added the row.
+added the row. Rows before the real-zoom baseline captured 2x with
+CDP-emulated device scale; their 2x numbers are history.
 
 | Div pin | Semantic: pages exact / boxes | Computed: pages exact / boxes | Computed blocks exact 1x / 2x | Change |
 | --- | --- | --- | --- | --- |
@@ -580,6 +588,7 @@ added the row.
 | `92ea25a0` | 0/48 / 0/392 | 8/48 / 214/392 | 46/92 / 34/92 | P2-2: semantic mode from Markdown source (24/24 trees equal the capture). Pixels changed only on the two image pages (300×150 images, G-IMG-SIZE) |
 | `92ea25a0` | 0/48 / 0/428 | 8/48 / 222/428 | 47/92 / 35/92 | P2-4b: the reference changed, as the pages highlight code with `@shikijs/rehype`. 36 new boxes on the 4 `code` and `readme` pages (Shiki's spans); 8 of them exact in computed mode, all 4 `readme` spans in each theme. The `readme-light` code block became exact at 1x and 2x. The other 20 pages: every value equal ([P2-4b](#p2-4b-result)) |
 | `d0d7f376` | 0/48 / 0/428 | 8/48 / 222/428 | 47/92 / 35/92 | none: every measured value equal to the P2-4b run (19 commits: docs, CI, tools, and one layout change, `78d771a1`, a flex column item's automatic minimum). The viewer, whose scroller is a flex column item, passes its 10 tests on Windows and Linux |
+| `d0d7f376` | 0/48 / 0/428 | 4/48 / 222/428 | 47/92 / 12/92 | **Real-zoom baseline.** 2x captured with `--force-device-scale-factor=2` (RFC 0010) instead of CDP emulation. 1x unchanged: every page, box and 1x block equal to the previous row. At 2x the computed pages that were exact (blockquote and hr, light and dark) now differ, and blocks exact fell from 35 to 12. On `hr` and `blockquote`, every new 2x difference is inside text (each paragraph's glyphs); the `hr` rules and box edges stay exact. Div's 2x render is unchanged, so this is Chromium's real-zoom text against Div's |
 
 ## CSS inventory
 

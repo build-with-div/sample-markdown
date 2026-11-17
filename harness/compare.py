@@ -10,8 +10,11 @@ HTML with github-markdown-css):
    `display`; `width` and `height` as computed, not used, values), and which
    pseudo-elements generate boxes. The viewport height
    is the page's scroll height, so the whole document is compared.
-2. Chromium rasterizes the page at each profile, in the same session
-   (two identical frames, as Div's census capture requires).
+2. Chromium rasterizes the page at each profile (two identical frames, as
+   Div's census capture requires). At 1x nothing is emulated; at any other
+   scale Chromium runs at real zoom, launched with
+   `--force-device-scale-factor` as Div's oracle captures are since RFC 0010
+   (build-with-div/div#59). CDP sets only the viewport size.
 3. `markdown-render` builds the page with Div's public API twice:
    `semantic` from the fixture's Markdown (`markdown-tree` parses it and
    `markdown-div` mounts tags, attributes and text, which is all Div can
@@ -170,13 +173,49 @@ def chromium_version(chrome: Path) -> str:
     return output.strip().split()[-1] if output.strip() else ""
 
 
-@contextmanager
-def chromium_page(chrome: Path, window=(WIDTH, 600)):
-    """A headless pinned Chromium with one page, driven over CDP.
+def device_scale_method(scale: float) -> str:
+    """`none` at 1x, `forced` (real zoom) at any other scale (RFC 0010)."""
+    return "none" if float(scale) == 1.0 else "forced"
 
-    The window is at least as large as the largest physical surface the
-    page is captured at, as Div's census renderer allocates it.
+
+def device_scale_launch(width: int, height: int, scale: float) -> tuple[list[str], dict]:
+    """The window flags and the CDP viewport override for one capture.
+
+    `device_scale_launch` in Div's tools/accountability/
+    run_all_pixel_comparisons.py at b6907b07 (build-with-div/div#59). The
+    pinned Div checkout predates it, so the harness carries the same
+    function; it uses Div's own once the pin includes it. At 1x the window
+    holds the frame and CDP sets DPR 1. At any other scale the browser's
+    own device scale is forced, so Blink lays out in device pixels as on a
+    high-DPI display, and `deviceScaleFactor: 0` keeps that scale while CDP
+    fixes the viewport size.
     """
+    shared = getattr(pixel_runner, "device_scale_launch", None)
+    if shared is not None:
+        return shared(width, height, scale)
+    width, height = int(width), int(height)
+    if device_scale_method(scale) == "none":
+        flags = [f"--window-size={int(width * scale + 0.5)},{int(height * scale + 0.5) + 87}"]
+        scale_override: float = float(scale)
+    else:
+        flags = [
+            f"--force-device-scale-factor={float(scale):g}",
+            f"--window-size={max(width, 500) + 16},{max(height, 300) + 160}",
+        ]
+        scale_override = 0
+    override = {"width": width, "height": height, "deviceScaleFactor": scale_override,
+                "mobile": False, "screenWidth": width, "screenHeight": height}
+    return flags, override
+
+
+@contextmanager
+def chromium_page(chrome: Path, height: int = 600, scale: float = 1.0):
+    """A headless pinned Chromium with one page, driven over CDP, launched
+    for one viewport (`WIDTH` × `height` CSS px) at one device scale.
+
+    Yields the client and the viewport override that `load` installs.
+    """
+    flags, override = device_scale_launch(WIDTH, height, scale)
     env = pixel_runner.chrome_environment(str(chrome.parent), use_real_font=True)
     with tempfile.TemporaryDirectory(prefix="sample-markdown-") as profile_dir, ExitStack() as stack:
         process = subprocess.Popen(
@@ -185,7 +224,7 @@ def chromium_page(chrome: Path, window=(WIDTH, 600)):
                 "--no-default-browser-check",
                 "--enable-features=FontDataServiceLinux:typeface/Freetype",
                 "--remote-debugging-port=0", f"--user-data-dir={profile_dir}",
-                f"--window-size={window[0]},{window[1] + 87}", "about:blank",
+                *flags, "about:blank",
             ],
             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True,
         )
@@ -194,14 +233,12 @@ def chromium_page(chrome: Path, window=(WIDTH, 600)):
         client = pixel_runner._CdpWebSocket(pixel_runner._page_websocket_url(port))
         stack.callback(pixel_runner._close_chromium_client, client)
         client.command("Page.enable")
-        yield client
+        yield client, override
 
 
-def load(client, page: Path, height: int, scale: float = 1.0) -> None:
-    client.command("Emulation.setDeviceMetricsOverride", {
-        "width": WIDTH, "height": height, "deviceScaleFactor": scale, "mobile": False,
-        "screenWidth": WIDTH, "screenHeight": height,
-    })
+def load(session, page: Path) -> None:
+    client, override = session
+    client.command("Emulation.setDeviceMetricsOverride", override)
     client.command("Page.navigate", {"url": "file:" + urllib.request.pathname2url(str(page))})
 
 
@@ -215,9 +252,11 @@ SETTLE_SCRIPT = (
 )
 
 
-def screenshot(client, page: Path, height: int, scale: float, output: Path) -> None:
-    """Capture the viewport as Div's census does: two identical frames."""
-    load(client, page, height, scale)
+def screenshot(session, page: Path, height: int, scale: float, output: Path) -> None:
+    """Capture the viewport as Div's census does: two identical frames.
+    The page must report the viewport and device scale asked for."""
+    load(session, page)
+    client = session[0]
     metrics = client.command("Runtime.evaluate", {
         "expression": SETTLE_SCRIPT, "awaitPromise": True, "returnByValue": True,
     }).get("result", {}).get("value")
@@ -232,9 +271,9 @@ def screenshot(client, page: Path, height: int, scale: float, output: Path) -> N
     output.write_bytes(base64.b64decode(frames[-1], validate=True))
 
 
-def capture(client, page: Path, height: int) -> dict:
-    load(client, page, height)
-    result = client.command(
+def capture(session, page: Path) -> dict:
+    load(session, page)
+    result = session[0].command(
         "Runtime.evaluate",
         {"expression": CAPTURE_SCRIPT, "awaitPromise": True, "returnByValue": True},
     ).get("result", {}).get("value")
@@ -308,16 +347,18 @@ def compare_fixture(fixture: dict, chrome: Path, renderer: Path, results: Path) 
     page = PAGES / fixture["page"]
     directory = results / fixture["id"]
     directory.mkdir(parents=True, exist_ok=True)
-    with chromium_page(chrome) as client:
-        first = capture(client, page, 600)
+    with chromium_page(chrome) as session:
+        first = capture(session, page)
     height = max(1, math.ceil(first["scroll_height"]))
-    scale_max = max(SCALES)
     chromium_pngs = {}
-    with chromium_page(chrome, (int(WIDTH * scale_max), int(height * scale_max))) as client:
-        tree = capture(client, page, height) if height != 600 else first
-        for scale in SCALES:
+    tree = first
+    # One browser per scale: real zoom is a launch flag (RFC 0010).
+    for scale in SCALES:
+        with chromium_page(chrome, height, scale) as session:
+            if scale == 1.0 and height != 600:
+                tree = capture(session, page)
             chromium_pngs[scale] = directory / f"chromium@{scale:g}x.png"
-            screenshot(client, page, height, scale, chromium_pngs[scale])
+            screenshot(session, page, height, scale, chromium_pngs[scale])
     tree = {"fixture": fixture["id"], "viewport": [WIDTH, height], "body": tree["body"]}
     attach_images(tree["body"], page.parent)
     pseudo: dict = {}
@@ -442,6 +483,8 @@ def main(argv: list[str] | None = None) -> int:
     div_commit = subprocess.run(["git", "-C", str(args.div), "rev-parse", "HEAD"],
                                 capture_output=True, text=True).stdout.strip()
     results = {"schema": SCHEMA, "chromium": version, "div_commit": div_commit,
+               "chromium_device_scale": {f"{scale:g}x": device_scale_method(scale)
+                                         for scale in SCALES},
                "reference_versions": manifest["versions"], "fixtures": rows}
     output = args.output or args.results / "results.json"
     output.parent.mkdir(parents=True, exist_ok=True)
